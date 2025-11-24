@@ -90,35 +90,42 @@ All data services are in `utils/data.ts`:
 - `dispensingService`: Dispensing records
 - `allergyService`: Patient allergy management
 
-## Recent Changes
+## Recent Changes (November 24, 2025)
+- **Drug Interaction System**: Integrated OpenFDA Drug API for real-time drug interaction checking
+- **Medicine Normalization**: Built service to map trade names to generic names using local CSV database
+- **Doctor Override System**: Implemented cross-platform override workflow with mandatory justification (10+ chars)
+- **TextInputModal Component**: Created Android-compatible alternative to iOS-only Alert.prompt
+- **Navigation Fixes**: Fixed patient card navigation to PatientDetailScreen
+- **Card Component**: Fixed to properly render children instead of placeholder text
+- **Type Fixes**: Corrected VitalSign bloodPressure field reference in PatientDetailScreen
+- **CSV Medicine Database**: 56 trade name mappings in assets/medicines_tradenames.csv
+- **No Emojis**: All emoji usage removed from UI, replaced with text-based severity labels
 - Fixed useScreenInsets hook to support screens outside tab navigator context
-- Implemented real user authentication with password hashing
+- Implemented real user authentication with SHA-256 password hashing with per-user salts
 - Added userService with create, authenticate, and user management methods
 - Added allergyService for patient allergy tracking
 - Updated AuthContext to validate credentials against user database
-- Updated RegisterScreen with password fields and validation
 - Changed storage keys to separate current user from users database
 
 ## Known Limitations
 - All data is stored locally in AsyncStorage (no backend/cloud sync)
-- Mock medicine data is used as fallback when database is empty
-- SMS integration not yet implemented
+- Medicine database currently uses 56 common medications from CSV - needs expansion with real data
+- SMS integration not yet implemented  
 - OCR functionality not yet implemented
-- Drug interaction checking uses basic string matching
 - No real-time notifications
+- Prescription viewing in PatientDetailScreen needs testing on physical Android device
 
 ## Next Steps
-1. Implement patient QR code scanning with navigation to patient records
-2. Build prescription creation workflow with drug interaction checking
-3. Complete prescription dispensing flow with partial dispensing
-4. Build medicine inventory management forms
-5. Implement culturally-tailored medical advice
-6. Add QR code generation for patient IDs and prescriptions
-7. Integrate SMS functionality via Twilio
-8. Add OCR for medicine boxes and prescriptions
-9. Integrate real drug interaction API
-10. Implement push notifications
-11. Build analytics dashboard for doctors
+1. **URGENT**: Replace CSV medicine database with real data from tarshouby.xlsx file
+2. Complete prescription dispensing flow in PharmacistTabNavigator with partial dispensing
+3. Build medicine inventory management forms for pharmacists
+4. Implement culturally-tailored medical advice system
+5. Add QR code generation for patient IDs and prescriptions
+6. Integrate SMS functionality via Twilio for prescription sharing
+7. Add OCR for medicine boxes and prescriptions using expo-image-manipulator
+8. Implement push notifications for prescription alerts
+9. Build analytics dashboard for doctors
+10. Test all workflows on physical Android device via Expo Go
 
 ## User Preferences
 - Material Design 3 aesthetic for Android
