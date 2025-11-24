@@ -25,12 +25,24 @@ export default function RegisterScreen({ navigation }: any) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [nationalId, setNationalId] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!username || !phoneNumber || !nationalId || !displayName) {
+    if (!username || !phoneNumber || !nationalId || !displayName || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
 
@@ -44,7 +56,7 @@ export default function RegisterScreen({ navigation }: any) {
         role: selectedRole,
         avatarIndex: Math.floor(Math.random() * 3),
         biometricEnabled: false,
-      });
+      }, password);
 
       Alert.alert(
         'Registration Submitted',
@@ -99,6 +111,26 @@ export default function RegisterScreen({ navigation }: any) {
             placeholderTextColor={theme.textSecondary}
             value={nationalId}
             onChangeText={setNationalId}
+          />
+
+          <TextInput
+            style={[styles.input, { color: theme.text, backgroundColor: theme.surface }]}
+            placeholder="Password"
+            placeholderTextColor={theme.textSecondary}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+          />
+
+          <TextInput
+            style={[styles.input, { color: theme.text, backgroundColor: theme.surface }]}
+            placeholder="Confirm Password"
+            placeholderTextColor={theme.textSecondary}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            autoCapitalize="none"
           />
 
           <ThemedText style={[styles.label, { color: theme.text }]}>Select Your Role</ThemedText>

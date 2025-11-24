@@ -1,19 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEYS = {
-  USER: '@medrecord_user',
+  CURRENT_USER: '@medrecord_current_user',
+  USERS: '@medrecord_users',
   PATIENTS: '@medrecord_patients',
   MEDICINES: '@medrecord_medicines',
   PRESCRIPTIONS: '@medrecord_prescriptions',
   VITAL_SIGNS: '@medrecord_vital_signs',
   LIFESTYLE_DATA: '@medrecord_lifestyle',
   DISPENSING_HISTORY: '@medrecord_dispensing',
+  ALLERGIES: '@medrecord_allergies',
 };
 
 export const storage = {
   async getUser() {
     try {
-      const value = await AsyncStorage.getItem(KEYS.USER);
+      const value = await AsyncStorage.getItem(KEYS.CURRENT_USER);
       return value ? JSON.parse(value) : null;
     } catch (error) {
       console.error('Error getting user:', error);
@@ -23,7 +25,7 @@ export const storage = {
 
   async setUser(user: any) {
     try {
-      await AsyncStorage.setItem(KEYS.USER, JSON.stringify(user));
+      await AsyncStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(user));
     } catch (error) {
       console.error('Error setting user:', error);
     }
@@ -31,7 +33,7 @@ export const storage = {
 
   async removeUser() {
     try {
-      await AsyncStorage.removeItem(KEYS.USER);
+      await AsyncStorage.removeItem(KEYS.CURRENT_USER);
     } catch (error) {
       console.error('Error removing user:', error);
     }

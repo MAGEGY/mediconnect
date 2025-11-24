@@ -1,5 +1,117 @@
 import { Medicine, Prescription, VitalSign, PatientAllergy, LifestyleData, DispensingRecord, User } from '@/types';
 import { storage } from './storage';
+import * as Crypto from 'expo-crypto';
+
+interface StoredUser extends User {
+  passwordHash: string;
+  salt: string;
+}
+
+async function generateSalt(): Promise<string> {
+  const randomBytes = await Crypto.getRandomBytesAsync(16);
+  return Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hashPassword(password: string, salt: string): Promise<string> {
+  const combined = password + salt;
+  return await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    combined
+  );
+}
+
+export const userService = {
+  async getAll(): Promise<User[]> {
+    const stored = await storage.getData<StoredUser[]>(storage.KEYS.USERS);
+    if (!stored) return [];
+    return stored.map(({ passwordHash, salt, ...user }) => user);
+  },
+
+  async findByUsername(username: string): Promise<StoredUser | null> {
+    const users = await storage.getData<StoredUser[]>(storage.KEYS.USERS) || [];
+    return users.find(u => 
+      u.username === username || 
+      u.phoneNumber === username || 
+      u.nationalId === username
+    ) || null;
+  },
+
+  async create(userData: Omit<User, 'id' | 'createdAt' | 'approvalStatus'>, password: string): Promise<User> {
+    const users = await storage.getData<StoredUser[]>(storage.KEYS.USERS) || [];
+    
+    const existing = users.find(u => 
+      u.username === userData.username || 
+      u.phoneNumber === userData.phoneNumber || 
+      u.nationalId === userData.nationalId
+    );
+    
+    if (existing) {
+      throw new Error('User already exists');
+    }
+
+    const salt = await generateSalt();
+    const passwordHash = await hashPassword(password, salt);
+    const newUser: StoredUser = {
+      ...userData,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      approvalStatus: 'pending',
+      passwordHash,
+      salt,
+    };
+
+    await storage.setData(storage.KEYS.USERS, [...users, newUser]);
+    
+    const { passwordHash: _, salt: __, ...userWithoutPassword } = newUser;
+    return userWithoutPassword;
+  },
+
+  async authenticate(username: string, password: string): Promise<User | null> {
+    const user = await this.findByUsername(username);
+    if (!user) return null;
+
+    const passwordHash = await hashPassword(password, user.salt);
+    if (passwordHash !== user.passwordHash) return null;
+
+    const { passwordHash: _, salt: __, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  },
+
+  async updateApprovalStatus(userId: string, status: 'pending' | 'approved' | 'rejected'): Promise<void> {
+    const users = await storage.getData<StoredUser[]>(storage.KEYS.USERS) || [];
+    const updated = users.map(u => u.id === userId ? { ...u, approvalStatus: status } : u);
+    await storage.setData(storage.KEYS.USERS, updated);
+  },
+
+  async enableBiometric(userId: string): Promise<void> {
+    const users = await storage.getData<StoredUser[]>(storage.KEYS.USERS) || [];
+    const updated = users.map(u => u.id === userId ? { ...u, biometricEnabled: true } : u);
+    await storage.setData(storage.KEYS.USERS, updated);
+  },
+
+  async createTestUsers(): Promise<void> {
+    const testUsers = [
+      { username: 'doctor1', phoneNumber: '+1234567890', nationalId: 'DOC001', displayName: 'Dr. Sarah Johnson', role: 'doctor' as const, password: 'password123' },
+      { username: 'patient1', phoneNumber: '+1234567891', nationalId: 'PAT001', displayName: 'John Doe', role: 'patient' as const, password: 'password123' },
+      { username: 'pharmacist1', phoneNumber: '+1234567892', nationalId: 'PHA001', displayName: 'Emily Davis', role: 'pharmacist' as const, password: 'password123' },
+    ];
+
+    for (const testUser of testUsers) {
+      const { password, ...userData } = testUser;
+      try {
+        const user = await this.create({
+          ...userData,
+          avatarIndex: 0,
+          biometricEnabled: false,
+        }, password);
+        
+        await this.updateApprovalStatus(user.id, 'approved');
+      } catch (error) {
+        console.log(`Test user ${testUser.username} already exists`);
+      }
+    }
+  },
+};
 
 const MOCK_MEDICINES: Medicine[] = [
   { id: '1', name: 'Aspirin', genericName: 'Acetylsalicylic acid', manufacturer: 'Bayer', dosageForm: 'Tablet', strength: '100mg', stockLevel: 500, interactions: ['Warfarin', 'Ibuprofen'] },
@@ -205,6 +317,30 @@ export const dispensingService = {
     };
     await storage.setData(storage.KEYS.DISPENSING_HISTORY, [...stored, newRecord]);
     return newRecord;
+  },
+};
+
+export const allergyService = {
+  async getByPatientId(patientId: string): Promise<PatientAllergy[]> {
+    const stored = await storage.getData<PatientAllergy[]>(storage.KEYS.ALLERGIES);
+    return (stored || []).filter(a => a.patientId === patientId);
+  },
+
+  async add(allergy: Omit<PatientAllergy, 'id' | 'recordedAt'>): Promise<PatientAllergy> {
+    const stored = await storage.getData<PatientAllergy[]>(storage.KEYS.ALLERGIES) || [];
+    const newAllergy: PatientAllergy = {
+      ...allergy,
+      id: Date.now().toString(),
+      recordedAt: new Date().toISOString(),
+    };
+    await storage.setData(storage.KEYS.ALLERGIES, [...stored, newAllergy]);
+    return newAllergy;
+  },
+
+  async remove(id: string): Promise<void> {
+    const stored = await storage.getData<PatientAllergy[]>(storage.KEYS.ALLERGIES) || [];
+    const updated = stored.filter(a => a.id !== id);
+    await storage.setData(storage.KEYS.ALLERGIES, updated);
   },
 };
 

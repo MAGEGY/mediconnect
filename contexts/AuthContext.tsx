@@ -2,12 +2,13 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import * as LocalAuthentication from 'expo-local-authentication';
 import { User } from '@/types';
 import { storage } from '@/utils/storage';
+import { userService } from '@/utils/data';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<boolean>;
-  register: (userData: Omit<User, 'id' | 'createdAt' | 'approvalStatus'>) => Promise<boolean>;
+  register: (userData: Omit<User, 'id' | 'createdAt' | 'approvalStatus'>, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   authenticateWithBiometric: () => Promise<boolean>;
 }
@@ -19,8 +20,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadUser();
+    init();
   }, []);
+
+  const init = async () => {
+    try {
+      await userService.createTestUsers();
+    } catch (error) {
+      console.error('Error creating test users:', error);
+    }
+    await loadUser();
+  };
 
   const loadUser = async () => {
     try {
@@ -34,35 +44,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (username: string, password: string): Promise<boolean> => {
-    const mockUser: User = {
-      id: '1',
-      username,
-      phoneNumber: '+1234567890',
-      nationalId: 'ID123456',
-      role: 'doctor',
-      approvalStatus: 'approved',
-      displayName: 'Dr. ' + username,
-      avatarIndex: 0,
-      biometricEnabled: true,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      const authenticatedUser = await userService.authenticate(username, password);
+      
+      if (!authenticatedUser) {
+        return false;
+      }
 
-    await storage.setUser(mockUser);
-    setUser(mockUser);
-    return true;
+      if (authenticatedUser.approvalStatus !== 'approved') {
+        return false;
+      }
+
+      await storage.setUser(authenticatedUser);
+      setUser(authenticatedUser);
+      return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
   };
 
-  const register = async (userData: Omit<User, 'id' | 'createdAt' | 'approvalStatus'>): Promise<boolean> => {
-    const newUser: User = {
-      ...userData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      approvalStatus: 'pending',
-    };
-
-    await storage.setUser(newUser);
-    setUser(newUser);
-    return true;
+  const register = async (userData: Omit<User, 'id' | 'createdAt' | 'approvalStatus'>, password: string): Promise<boolean> => {
+    try {
+      await userService.create(userData, password);
+      return true;
+    } catch (error) {
+      console.error('Registration error:', error);
+      return false;
+    }
   };
 
   const logout = async () => {
