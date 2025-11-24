@@ -1,6 +1,7 @@
 import { Medicine, Prescription, VitalSign, PatientAllergy, LifestyleData, DispensingRecord, User } from '@/types';
 import { storage } from './storage';
 import * as Crypto from 'expo-crypto';
+import { MEDICINES_DATABASE } from '@/constants/medicinesDatabase';
 
 interface StoredUser extends User {
   passwordHash: string;
@@ -113,16 +114,8 @@ export const userService = {
   },
 };
 
-const MOCK_MEDICINES: Medicine[] = [
-  { id: '1', name: 'Aspirin', genericName: 'Acetylsalicylic acid', manufacturer: 'Bayer', dosageForm: 'Tablet', strength: '100mg', stockLevel: 500, interactions: ['Warfarin', 'Ibuprofen'] },
-  { id: '2', name: 'Lisinopril', genericName: 'Lisinopril', manufacturer: 'Merck', dosageForm: 'Tablet', strength: '10mg', stockLevel: 300, interactions: ['Potassium supplements'] },
-  { id: '3', name: 'Metformin', genericName: 'Metformin HCl', manufacturer: 'Teva', dosageForm: 'Tablet', strength: '500mg', stockLevel: 450, interactions: ['Alcohol'] },
-  { id: '4', name: 'Amoxicillin', genericName: 'Amoxicillin', manufacturer: 'GSK', dosageForm: 'Capsule', strength: '250mg', stockLevel: 200, interactions: ['Warfarin'] },
-  { id: '5', name: 'Atorvastatin', genericName: 'Atorvastatin', manufacturer: 'Pfizer', dosageForm: 'Tablet', strength: '20mg', stockLevel: 350, interactions: ['Grapefruit juice'] },
-  { id: '6', name: 'Omeprazole', genericName: 'Omeprazole', manufacturer: 'AstraZeneca', dosageForm: 'Capsule', strength: '20mg', stockLevel: 400 },
-  { id: '7', name: 'Levothyroxine', genericName: 'Levothyroxine sodium', manufacturer: 'Abbott', dosageForm: 'Tablet', strength: '50mcg', stockLevel: 250 },
-  { id: '8', name: 'Albuterol', genericName: 'Albuterol sulfate', manufacturer: 'GSK', dosageForm: 'Inhaler', strength: '90mcg', stockLevel: 100 },
-];
+// MOCK_MEDICINES replaced with comprehensive database from tarshouby.xlsx (6,522 medicines)
+// Import from constants/medicinesDatabase.ts
 
 const MOCK_PATIENTS: User[] = [
   {
@@ -166,7 +159,7 @@ const MOCK_PATIENTS: User[] = [
 export const medicineService = {
   async getAll(): Promise<Medicine[]> {
     const stored = await storage.getData<Medicine[]>(storage.KEYS.MEDICINES);
-    return stored || MOCK_MEDICINES;
+    return stored || MEDICINES_DATABASE;
   },
 
   async search(query: string): Promise<Medicine[]> {
