@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TextInput, Pressable, FlatList, Image } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTheme } from '@/hooks/useTheme';
@@ -10,6 +11,7 @@ import { patientService } from '@/utils/data';
 import { User } from '@/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { DoctorStackParamList } from '@/navigation/DoctorStackNavigator';
 
 const AVATARS = [
   require('@/assets/avatars/stethoscope.png'),
@@ -18,6 +20,7 @@ const AVATARS = [
 ];
 
 export default function PatientsScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<DoctorStackParamList>>();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
@@ -56,6 +59,7 @@ export default function PatientsScreen() {
 
   const renderPatientCard = ({ item }: { item: User }) => (
     <Pressable
+      onPress={() => navigation.navigate('PatientDetail', { patientId: item.id })}
       style={[styles.patientCard, { backgroundColor: theme.surface }]}
       android_ripple={{ color: theme.primary + '20' }}
     >
