@@ -178,24 +178,47 @@ export default function PatientDetailScreen({ route, navigation }: Props) {
               prescriptions.map((prescription) => (
                 <Card key={prescription.id} style={styles.section}>
                   <View style={styles.prescriptionHeader}>
-                    <ThemedText style={styles.medicineName}>{prescription.medicineName}</ThemedText>
+                    <View style={styles.prescriptionHeaderLeft}>
+                      <ThemedText style={styles.prescriptionId}>Rx: {prescription.id}</ThemedText>
+                      <ThemedText style={[styles.prescriptionDoctor, { color: theme.textSecondary }]}>
+                        Dr. {prescription.doctorName}
+                      </ThemedText>
+                    </View>
                     <View style={[
                       styles.statusBadge,
-                      { backgroundColor: prescription.status === 'dispensed' ? theme.success + '20' : theme.warning + '20' }
+                      { backgroundColor: prescription.dispensedAt ? theme.success + '20' : theme.warning + '20' }
                     ]}>
                       <ThemedText style={[
                         styles.statusText,
-                        { color: prescription.status === 'dispensed' ? theme.success : theme.warning }
+                        { color: prescription.dispensedAt ? theme.success : theme.warning }
                       ]}>
-                        {prescription.status}
+                        {prescription.dispensedAt ? 'Dispensed' : 'Pending'}
                       </ThemedText>
                     </View>
                   </View>
-                  <ThemedText style={[styles.dosage, { color: theme.textSecondary }]}>
-                    {prescription.dosage} - {prescription.frequency}
-                  </ThemedText>
+
+                  <View style={styles.medicinesSection}>
+                    <ThemedText style={[styles.medicinesTitle, { color: theme.textSecondary }]}>
+                      Medicines:
+                    </ThemedText>
+                    {prescription.medicines.map((medicine, index) => (
+                      <View key={index} style={styles.medicineItem}>
+                        <MaterialCommunityIcons name="pill" size={16} color={theme.primary} />
+                        <View style={styles.medicineItemContent}>
+                          <ThemedText style={styles.medicineItemName}>{medicine.medicineName}</ThemedText>
+                          <ThemedText style={[styles.medicineItemDetails, { color: theme.textSecondary }]}>
+                            {medicine.dosage} - {medicine.frequency} - {medicine.duration}
+                          </ThemedText>
+                          <ThemedText style={[styles.medicineItemQuantity, { color: theme.textSecondary }]}>
+                            Qty: {medicine.quantity}
+                          </ThemedText>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+
                   <ThemedText style={[styles.prescriptionDate, { color: theme.textSecondary }]}>
-                    {new Date(prescription.prescribedAt).toLocaleDateString()}
+                    Prescribed: {new Date(prescription.createdAt).toLocaleDateString()}
                   </ThemedText>
                   {prescription.notes ? (
                     <ThemedText style={[styles.notes, { color: theme.textSecondary }]}>
@@ -384,13 +407,19 @@ const styles = StyleSheet.create({
   prescriptionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
+    alignItems: 'flex-start',
+    marginBottom: Spacing.md,
   },
-  medicineName: {
-    fontSize: 16,
-    fontWeight: '600',
+  prescriptionHeaderLeft: {
     flex: 1,
+  },
+  prescriptionId: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: Spacing.xs,
+  },
+  prescriptionDoctor: {
+    fontSize: 12,
   },
   statusBadge: {
     paddingHorizontal: Spacing.md,
@@ -402,12 +431,44 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textTransform: 'capitalize',
   },
-  dosage: {
+  medicinesSection: {
+    marginBottom: Spacing.md,
+  },
+  medicinesTitle: {
     fontSize: 14,
+    fontWeight: '500',
+    marginBottom: Spacing.sm,
+  },
+  medicineItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
+    paddingLeft: Spacing.sm,
+  },
+  medicineItemContent: {
+    flex: 1,
+  },
+  medicineItemName: {
+    fontSize: 14,
+    fontWeight: '500',
     marginBottom: Spacing.xs,
+  },
+  medicineItemDetails: {
+    fontSize: 13,
+    marginBottom: Spacing.xs,
+  },
+  medicineItemQuantity: {
+    fontSize: 12,
+  },
+  medicineName: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
   },
   prescriptionDate: {
     fontSize: 12,
+    marginTop: Spacing.sm,
   },
   notes: {
     fontSize: 12,
