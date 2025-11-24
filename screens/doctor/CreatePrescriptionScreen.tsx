@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, Pressable, Alert, ScrollView } from 'react-native';
+import { View, StyleSheet, TextInput, Pressable, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ScreenKeyboardAwareScrollView } from '@/components/ScreenKeyboardAwareScrollView';
 import { Card } from '@/components/Card';
+import { TextInputModal } from '@/components/TextInputModal';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/contexts/AuthContext';
 import { Spacing, BorderRadius } from '@/constants/theme';
 import { DoctorStackParamList } from '@/navigation/DoctorStackNavigator';
 import { Medicine, User, PatientAllergy, PrescriptionMedicine } from '@/types';
 import { medicineService, patientService, allergyService, prescriptionService } from '@/utils/data';
+import { checkDrugInteractions, DrugInteraction } from '@/services/fdaService';
+import { getGenericName, normalizeForComparison, getAllVariants } from '@/utils/medicineNormalization';
 
 type Props = NativeStackScreenProps<DoctorStackParamList, 'CreatePrescription'>;
 
 interface SelectedMedicine extends PrescriptionMedicine {
   warnings: string[];
+  overrideJustification?: string;
 }
 
 export default function CreatePrescriptionScreen({ route, navigation }: Props) {
@@ -35,6 +39,9 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
   const [tempFrequency, setTempFrequency] = useState('');
   const [tempDuration, setTempDuration] = useState('');
   const [tempQuantity, setTempQuantity] = useState('');
+  const [checkingInteractions, setCheckingInteractions] = useState(false);
+  const [showJustificationModal, setShowJustificationModal] = useState(false);
+  const [pendingMedicine, setPendingMedicine] = useState<{ medicine: Medicine; warnings: string[] } | null>(null);
 
   useEffect(() => {
     loadPatientData();
@@ -60,54 +67,71 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
 
   const checkInteractions = async (medicine: Medicine): Promise<string[]> => {
     const warningSet = new Set<string>();
+    const medicineGeneric = getGenericName(medicine.name);
+    const medicineVariants = getAllVariants(medicine.name);
 
     allergies.forEach(allergy => {
-      const allergenLower = allergy.allergen.toLowerCase().trim();
-      const medNameLower = medicine.name.toLowerCase().trim();
-      const medGenericLower = medicine.genericName.toLowerCase().trim();
+      const allergenGeneric = getGenericName(allergy.allergen);
+      const allergenVariants = getAllVariants(allergy.allergen);
       
-      if (
-        medNameLower.includes(allergenLower) ||
-        medGenericLower.includes(allergenLower) ||
-        allergenLower.includes(medNameLower) ||
-        allergenLower.includes(medGenericLower)
-      ) {
-        warningSet.add(`ALLERGY WARNING: Patient is ${allergy.severity} allergic to ${allergy.allergen}`);
+      const isMatch = 
+        normalizeForComparison(medicine.name, allergy.allergen) ||
+        normalizeForComparison(medicine.genericName, allergy.allergen) ||
+        normalizeForComparison(medicine.name, allergenGeneric) ||
+        medicineVariants.some(variant => 
+          allergenVariants.some(allergenVariant => 
+            normalizeForComparison(variant, allergenVariant)
+          )
+        );
+      
+      if (isMatch) {
+        warningSet.add(`ALLERGY ALERT: Patient has ${allergy.severity} allergy to ${allergy.allergen} (matches ${medicine.name})`);
       }
     });
 
     for (const selected of selectedMedicines) {
-      const selectedMedicine = await medicineService.getById(selected.medicineId);
+      const fdaInteractions = await checkDrugInteractions(medicine.name, selected.medicineName);
       
+      fdaInteractions.forEach((interaction: DrugInteraction) => {
+        const severityLabel = interaction.severity === 'high' ? '[HIGH SEVERITY]' : 
+                              interaction.severity === 'moderate' ? '[MODERATE]' : '[LOW]';
+        warningSet.add(`${severityLabel} ${interaction.description.substring(0, 200)}`);
+      });
+
+      const isRelated = normalizeForComparison(medicine.name, selected.medicineName);
+      if (isRelated) {
+        warningSet.add(`DUPLICATE: ${medicine.name} and ${selected.medicineName} are the same medicine (different brands)`);
+      }
+
+      const selectedMedicine = await medicineService.getById(selected.medicineId);
       if (medicine.interactions) {
         medicine.interactions.forEach(interaction => {
-          const interactionLower = interaction.toLowerCase().trim();
-          const selectedNameLower = selected.medicineName.toLowerCase().trim();
-          const selectedGenericLower = selectedMedicine?.genericName.toLowerCase().trim() || '';
+          const selectedGeneric = getGenericName(selected.medicineName);
+          const selectedVariants = getAllVariants(selected.medicineName);
           
-          if (
-            selectedNameLower.includes(interactionLower) ||
-            interactionLower.includes(selectedNameLower) ||
-            (selectedGenericLower && (selectedGenericLower.includes(interactionLower) || interactionLower.includes(selectedGenericLower)))
-          ) {
-            warningSet.add(`Drug interaction: ${medicine.name} may interact with ${selected.medicineName}`);
+          const interactionLower = interaction.toLowerCase().trim();
+          const matchesInteraction = 
+            selectedVariants.some(variant => 
+              variant.toLowerCase().includes(interactionLower) || 
+              interactionLower.includes(variant.toLowerCase())
+            );
+          
+          if (matchesInteraction) {
+            warningSet.add(`LOCAL DATA: ${medicine.name} may interact with ${selected.medicineName}`);
           }
         });
       }
       
       if (selectedMedicine && selectedMedicine.interactions) {
+        const medicineVariantsLower = medicineVariants.map(v => v.toLowerCase());
         selectedMedicine.interactions.forEach(interaction => {
           const interactionLower = interaction.toLowerCase().trim();
-          const medNameLower = medicine.name.toLowerCase().trim();
-          const medGenericLower = medicine.genericName.toLowerCase().trim();
+          const matchesInteraction = medicineVariantsLower.some(variant =>
+            variant.includes(interactionLower) || interactionLower.includes(variant)
+          );
           
-          if (
-            medNameLower.includes(interactionLower) ||
-            medGenericLower.includes(interactionLower) ||
-            interactionLower.includes(medNameLower) ||
-            interactionLower.includes(medGenericLower)
-          ) {
-            warningSet.add(`Drug interaction: ${selected.medicineName} may interact with ${medicine.name}`);
+          if (matchesInteraction) {
+            warningSet.add(`LOCAL DATA: ${selected.medicineName} may interact with ${medicine.name}`);
           }
         });
       }
@@ -117,18 +141,20 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
   };
 
   const handleAddMedicine = async (medicine: Medicine) => {
+    setCheckingInteractions(true);
     const warnings = await checkInteractions(medicine);
+    setCheckingInteractions(false);
     
     if (warnings.length > 0) {
       Alert.alert(
-        'Warnings Detected',
-        warnings.join('\n\n'),
+        'Safety Warnings Detected',
+        warnings.join('\n\n') + '\n\nDo you want to override these warnings?',
         [
           { text: 'Cancel', style: 'cancel' },
           {
-            text: 'Add Anyway',
+            text: 'Override & Continue',
             style: 'destructive',
-            onPress: () => addMedicineToList(medicine, warnings),
+            onPress: () => promptForJustification(medicine, warnings),
           },
         ]
       );
@@ -137,7 +163,25 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
     }
   };
 
-  const addMedicineToList = (medicine: Medicine, warnings: string[]) => {
+  const promptForJustification = (medicine: Medicine, warnings: string[]) => {
+    setPendingMedicine({ medicine, warnings });
+    setShowJustificationModal(true);
+  };
+
+  const handleJustificationSubmit = (justification: string) => {
+    if (pendingMedicine) {
+      addMedicineToList(pendingMedicine.medicine, pendingMedicine.warnings, justification);
+    }
+    setShowJustificationModal(false);
+    setPendingMedicine(null);
+  };
+
+  const handleJustificationCancel = () => {
+    setShowJustificationModal(false);
+    setPendingMedicine(null);
+  };
+
+  const addMedicineToList = (medicine: Medicine, warnings: string[], justification?: string) => {
     setSelectedMedicines([
       ...selectedMedicines,
       {
@@ -148,6 +192,7 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
         duration: '',
         quantity: 0,
         warnings,
+        overrideJustification: justification,
       },
     ]);
     setSearchQuery('');
@@ -168,8 +213,47 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
     setTempQuantity(medicine.quantity.toString());
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editingIndex !== null) {
+      const editedMedicine = selectedMedicines[editingIndex];
+      const medicine = await medicineService.getById(editedMedicine.medicineId);
+      
+      if (medicine) {
+        setCheckingInteractions(true);
+        const updatedWarnings = await checkInteractions(medicine);
+        setCheckingInteractions(false);
+        
+        const newWarnings = updatedWarnings.filter(w => !editedMedicine.warnings.includes(w));
+        
+        if (newWarnings.length > 0 && !editedMedicine.overrideJustification) {
+          Alert.alert(
+            'New Warnings Detected',
+            newWarnings.join('\n\n') + '\n\nDo you want to continue?',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Continue',
+                onPress: () => {
+                  const updated = [...selectedMedicines];
+                  updated[editingIndex] = {
+                    ...updated[editingIndex],
+                    dosage: tempDosage,
+                    frequency: tempFrequency,
+                    duration: tempDuration,
+                    quantity: parseInt(tempQuantity) || 0,
+                    warnings: updatedWarnings,
+                  };
+                  setSelectedMedicines(updated);
+                  setEditingIndex(null);
+                  clearTempFields();
+                },
+              },
+            ]
+          );
+          return;
+        }
+      }
+      
       const updated = [...selectedMedicines];
       updated[editingIndex] = {
         ...updated[editingIndex],
@@ -180,19 +264,20 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
       };
       setSelectedMedicines(updated);
       setEditingIndex(null);
-      setTempDosage('');
-      setTempFrequency('');
-      setTempDuration('');
-      setTempQuantity('');
+      clearTempFields();
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingIndex(null);
+  const clearTempFields = () => {
     setTempDosage('');
     setTempFrequency('');
     setTempDuration('');
     setTempQuantity('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    clearTempFields();
   };
 
   const validateAndSubmit = async () => {
@@ -210,13 +295,62 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
       }
     }
 
+    setCheckingInteractions(true);
+    const allWarnings: string[] = [];
+    for (const selectedMed of selectedMedicines) {
+      const medicine = await medicineService.getById(selectedMed.medicineId);
+      if (medicine) {
+        const warnings = await checkInteractions(medicine);
+        if (warnings.length > 0) {
+          allWarnings.push(`${selectedMed.medicineName}:\n${warnings.join('\n')}`);
+        }
+      }
+    }
+    setCheckingInteractions(false);
+
+    if (allWarnings.length > 0) {
+      const hasUnoverriddenWarnings = selectedMedicines.some(med => 
+        med.warnings.length > 0 && !med.overrideJustification
+      );
+      
+      if (hasUnoverriddenWarnings) {
+        Alert.alert(
+          'Final Safety Check',
+          'This prescription has the following warnings:\n\n' + allWarnings.join('\n\n') + '\n\nAll warnings must be reviewed and justified.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
+      Alert.alert(
+        'Final Safety Confirmation',
+        'This prescription has warnings that have been reviewed and justified. Proceed with creation?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Create Prescription',
+            onPress: submitPrescription,
+          },
+        ]
+      );
+    } else {
+      submitPrescription();
+    }
+  };
+
+  const submitPrescription = async () => {
+    if (!patient || !user) return;
+
     try {
       await prescriptionService.create({
         patientId: patient.id,
         patientName: patient.displayName,
         doctorId: user.id,
         doctorName: user.displayName,
-        medicines: selectedMedicines.map(({ warnings, ...med }) => med),
+        medicines: selectedMedicines.map(({ warnings, overrideJustification, ...med }) => ({
+          ...med,
+          notes: overrideJustification ? `Override: ${overrideJustification}` : undefined,
+        })),
         notes: notes.trim(),
       });
 
@@ -241,6 +375,15 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
   return (
     <ScreenKeyboardAwareScrollView>
       <ThemedView>
+        {checkingInteractions ? (
+          <View style={[styles.loadingOverlay, { backgroundColor: theme.primary + '20' }]}>
+            <ActivityIndicator size="small" color={theme.primary} />
+            <ThemedText style={[styles.loadingText, { color: theme.primary }]}>
+              Checking drug interactions with FDA database...
+            </ThemedText>
+          </View>
+        ) : null}
+
         <Card>
             <ThemedText style={styles.sectionTitle}>Patient Information</ThemedText>
             <ThemedText style={styles.patientName}>{patient.displayName}</ThemedText>
@@ -343,6 +486,17 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
                   </View>
                 ))}
 
+                {medicine.overrideJustification ? (
+                  <View
+                    style={[styles.justificationBanner, { backgroundColor: theme.primary + '20', borderColor: theme.primary }]}
+                  >
+                    <MaterialCommunityIcons name="shield-check" size={16} color={theme.primary} />
+                    <ThemedText style={[styles.justificationText, { color: theme.primary }]}>
+                      Override Justification: {medicine.overrideJustification}
+                    </ThemedText>
+                  </View>
+                ) : null}
+
                 {editingIndex === index ? (
                   <View style={styles.editForm}>
                     <TextInput
@@ -442,6 +596,16 @@ export default function CreatePrescriptionScreen({ route, navigation }: Props) {
             <ThemedText style={styles.submitButtonText}>Create Prescription</ThemedText>
           </Pressable>
         </ThemedView>
+
+        <TextInputModal
+          visible={showJustificationModal}
+          title="Override Justification Required"
+          message="Please provide a clinical justification for overriding these safety warnings:"
+          placeholder="Enter clinical justification (minimum 10 characters)..."
+          minLength={10}
+          onSubmit={handleJustificationSubmit}
+          onCancel={handleJustificationCancel}
+        />
       </ScreenKeyboardAwareScrollView>
   );
 }
@@ -648,5 +812,31 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  loadingOverlay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
+  },
+  loadingText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  justificationBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.sm,
+    borderWidth: 1,
+    gap: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  justificationText: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '500',
   },
 });

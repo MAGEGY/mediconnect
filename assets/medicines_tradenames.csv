@@ -1,0 +1,58 @@
+trade_name,generic_name,category
+Tylenol,Acetaminophen,Pain Relief
+Advil,Ibuprofen,Pain Relief
+Motrin,Ibuprofen,Pain Relief
+Aleve,Naproxen,Pain Relief
+Aspirin,Acetylsalicylic Acid,Pain Relief
+Coumadin,Warfarin,Anticoagulant
+Jantoven,Warfarin,Anticoagulant
+Plavix,Clopidogrel,Antiplatelet
+Lipitor,Atorvastatin,Statin
+Crestor,Rosuvastatin,Statin
+Zocor,Simvastatin,Statin
+Glucophage,Metformin,Diabetes
+Amaryl,Glimepiride,Diabetes
+Lantus,Insulin Glargine,Diabetes
+Norvasc,Amlodipine,Blood Pressure
+Vasotec,Enalapril,Blood Pressure
+Lasix,Furosemide,Diuretic
+Zithromax,Azithromycin,Antibiotic
+Amoxil,Amoxicillin,Antibiotic
+Augmentin,Amoxicillin-Clavulanate,Antibiotic
+Cipro,Ciprofloxacin,Antibiotic
+Levaquin,Levofloxacin,Antibiotic
+Keflex,Cephalexin,Antibiotic
+Zoloft,Sertraline,Antidepressant
+Prozac,Fluoxetine,Antidepressant
+Lexapro,Escitalopram,Antidepressant
+Xanax,Alprazolam,Anxiolytic
+Ativan,Lorazepam,Anxiolytic
+Valium,Diazepam,Anxiolytic
+Nexium,Esomeprazole,PPI
+Prilosec,Omeprazole,PPI
+Prevacid,Lansoprazole,PPI
+Ventolin,Albuterol,Bronchodilator
+Proventil,Albuterol,Bronchodilator
+Singulair,Montelukast,Asthma
+Synthroid,Levothyroxine,Thyroid
+Levoxyl,Levothyroxine,Thyroid
+Claritin,Loratadine,Antihistamine
+Zyrtec,Cetirizine,Antihistamine
+Allegra,Fexofenadine,Antihistamine
+Benadryl,Diphenhydramine,Antihistamine
+Viagra,Sildenafil,ED Treatment
+Cialis,Tadalafil,ED Treatment
+Ambien,Zolpidem,Sleep Aid
+Lyrica,Pregabalin,Neuropathic Pain
+Neurontin,Gabapentin,Neuropathic Pain
+Eliquis,Apixaban,Anticoagulant
+Xarelto,Rivaroxaban,Anticoagulant
+Metoprolol,Metoprolol,Beta Blocker
+Toprol,Metoprolol,Beta Blocker
+Lopressor,Metoprolol,Beta Blocker
+Coreg,Carvedilol,Beta Blocker
+Diovan,Valsartan,ARB
+Cozaar,Losartan,ARB
+Lisinopril,Lisinopril,ACE Inhibitor
+Prinivil,Lisinopril,ACE Inhibitor
+Zestril,Lisinopril,ACE Inhibitor
