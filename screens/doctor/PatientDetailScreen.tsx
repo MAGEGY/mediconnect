@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ScreenScrollView } from '@/components/ScreenScrollView';
 import { Card } from '@/components/Card';
 import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius } from '@/constants/theme';
+import { Spacing, BorderRadius, IconSize } from '@/constants/theme';
 import { DoctorStackParamList } from '@/navigation/DoctorStackNavigator';
 import { User, Prescription, VitalSign, PatientAllergy } from '@/types';
 import { patientService, prescriptionService, vitalSignsService, allergyService } from '@/utils/data';
@@ -99,7 +99,7 @@ export default function PatientDetailScreen({ route, navigation }: Props) {
                       key={allergy.id}
                       style={[styles.allergyBadge, { backgroundColor: theme.error + '20', borderColor: theme.error }]}
                     >
-                      <MaterialCommunityIcons name="alert" size={16} color={theme.error} />
+                      <MaterialCommunityIcons name="alert" size={IconSize.xs} color={theme.error} />
                       <ThemedText style={[styles.allergyText, { color: theme.error }]}>
                         {allergy.allergen}
                       </ThemedText>

@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ScreenScrollView } from '@/components/ScreenScrollView';
 import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius, Shadows } from '@/constants/theme';
+import { Spacing, BorderRadius, Shadows, IconSize } from '@/constants/theme';
 
 const AVATARS = [
   require('@/assets/avatars/stethoscope.png'),
@@ -52,13 +52,13 @@ export default function ProfileScreen() {
     >
       <MaterialCommunityIcons
         name={icon}
-        size={24}
+        size={IconSize.md}
         color={danger ? theme.error : theme.textSecondary}
       />
       <ThemedText style={[styles.menuText, danger && { color: theme.error }]}>
         {title}
       </ThemedText>
-      <MaterialCommunityIcons name="chevron-right" size={24} color={theme.textSecondary} />
+      <MaterialCommunityIcons name="chevron-right" size={IconSize.md} color={theme.textSecondary} />
     </Pressable>
   );
 

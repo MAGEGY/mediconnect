@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TextInput, Pressable, FlatList, Image } from 'react-native';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius, Shadows } from '@/constants/theme';
+import { Spacing, BorderRadius, Shadows, IconSize } from '@/constants/theme';
 import { patientService } from '@/utils/data';
 import { User } from '@/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,6 +33,12 @@ export default function PatientsScreen() {
   useEffect(() => {
     loadPatients();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadPatients();
+    }, [])
+  );
 
   useEffect(() => {
     if (searchQuery) {
@@ -75,7 +82,7 @@ export default function PatientsScreen() {
           {item.phoneNumber}
         </ThemedText>
       </View>
-      <MaterialCommunityIcons name="chevron-right" size={24} color={theme.textSecondary} />
+      <MaterialCommunityIcons name="chevron-right" size={IconSize.md} color={theme.textSecondary} />
     </Pressable>
   );
 
@@ -95,7 +102,7 @@ export default function PatientsScreen() {
     <ThemedView style={styles.container}>
       <View style={[styles.searchContainer, { backgroundColor: theme.backgroundDefault }]}>
         <View style={[styles.searchBar, { backgroundColor: theme.surface }]}>
-          <Feather name="search" size={20} color={theme.textSecondary} />
+          <Feather name="search" size={IconSize.sm} color={theme.textSecondary} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
             placeholder="Search patients..."
@@ -112,12 +119,31 @@ export default function PatientsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[
           styles.listContent,
-          { paddingBottom: tabBarHeight + Spacing.xl },
+          { paddingBottom: tabBarHeight + Spacing.xl + Spacing['5xl'] + Spacing.lg },
         ]}
         ListEmptyComponent={renderEmptyState}
         refreshing={loading}
         onRefresh={loadPatients}
       />
+      
+      <Pressable
+        style={[
+          styles.fab,
+          {
+            backgroundColor: theme.primary,
+            bottom: tabBarHeight + Spacing.xl + insets.bottom,
+          },
+        ]}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          navigation.navigate('AddPatient');
+        }}
+        android_ripple={{ color: theme.buttonText + '40', radius: 28 }}
+        accessibilityLabel="Add new patient"
+        accessibilityRole="button"
+      >
+        <MaterialCommunityIcons name="plus" size={IconSize.lg} color={theme.buttonText} />
+      </Pressable>
     </ThemedView>
   );
 }
@@ -186,5 +212,19 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+  },
+  fab: {
+    position: 'absolute',
+    right: Spacing.xl,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
 });
