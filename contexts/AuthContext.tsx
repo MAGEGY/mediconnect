@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import * as LocalAuthentication from 'expo-local-authentication';
 import { User } from '@/types';
 import { storage } from '@/utils/storage';
-import { userService } from '@/utils/data';
+import { userService, createTestDataIfEmpty } from '@/utils/data';
 
 interface AuthContextType {
   user: User | null;
@@ -26,8 +26,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const init = async () => {
     try {
       await userService.createTestUsers();
+      await createTestDataIfEmpty();
     } catch (error) {
-      console.error('Error creating test users:', error);
+      console.error('Error initializing test data:', error);
     }
     await loadUser();
   };

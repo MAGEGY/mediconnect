@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginScreen from '@/screens/auth/LoginScreen';
 import RegisterScreen from '@/screens/auth/RegisterScreen';
-import DoctorTabNavigator from './DoctorTabNavigator';
+import DoctorStackNavigator from './DoctorStackNavigator';
 import PatientTabNavigator from './PatientTabNavigator';
 import PharmacistTabNavigator from './PharmacistTabNavigator';
 import { ActivityIndicator, View } from 'react-native';
@@ -44,7 +44,7 @@ export default function RootNavigator() {
       case 'lab':
       case 'physiotherapy':
       case 'radiologist':
-        return <Stack.Screen name="DoctorMain" component={DoctorTabNavigator} />;
+        return <Stack.Screen name="DoctorMain" component={DoctorStackNavigator} />;
       case 'patient':
         return <Stack.Screen name="PatientMain" component={PatientTabNavigator} />;
       case 'pharmacist':

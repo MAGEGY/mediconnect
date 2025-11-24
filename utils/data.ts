@@ -218,7 +218,7 @@ export const patientService = {
 
   async getById(id: string): Promise<User | null> {
     const all = await this.getAll();
-    return all.find(p => p.id === id) || null;
+    return all.find(p => p.id.toLowerCase() === id.toLowerCase()) || null;
   },
 };
 
@@ -376,3 +376,101 @@ export const MEDICAL_ADVICE = [
     icon: 'clipboard-pulse',
   },
 ];
+
+export async function createTestDataIfEmpty() {
+  const existingPatients = await storage.getData<User[]>(storage.KEYS.PATIENTS);
+  if (!existingPatients || existingPatients.length === 0) {
+    await storage.setData(storage.KEYS.PATIENTS, MOCK_PATIENTS);
+  }
+
+  const existingPrescriptions = await storage.getData<Prescription[]>(storage.KEYS.PRESCRIPTIONS);
+  if (!existingPrescriptions || existingPrescriptions.length === 0) {
+    const testPrescriptions: Prescription[] = [
+      {
+        id: 'RX001',
+        patientId: 'P001',
+        doctorId: '1',
+        medicineName: 'Amoxicillin',
+        dosage: '500mg',
+        frequency: 'Three times daily',
+        duration: '7 days',
+        notes: 'Take with food',
+        prescribedAt: '2024-03-15T10:00:00Z',
+        createdAt: '2024-03-15T10:00:00Z',
+        qrCode: 'medrecord://prescription/RX001',
+        webLink: 'https://medrecord.app/rx/RX001',
+        status: 'active',
+      },
+      {
+        id: 'RX002',
+        patientId: 'P001',
+        doctorId: '1',
+        medicineName: 'Lisinopril',
+        dosage: '10mg',
+        frequency: 'Once daily',
+        duration: '30 days',
+        notes: 'For blood pressure management',
+        prescribedAt: '2024-03-10T14:30:00Z',
+        createdAt: '2024-03-10T14:30:00Z',
+        qrCode: 'medrecord://prescription/RX002',
+        webLink: 'https://medrecord.app/rx/RX002',
+        status: 'dispensed',
+        dispensedAt: '2024-03-11T09:00:00Z',
+        dispensedBy: '3',
+      },
+    ];
+    await storage.setData(storage.KEYS.PRESCRIPTIONS, testPrescriptions);
+  }
+
+  const existingVitals = await storage.getData<VitalSign[]>(storage.KEYS.VITAL_SIGNS);
+  if (!existingVitals || existingVitals.length === 0) {
+    const testVitals: VitalSign[] = [
+      {
+        id: 'V001',
+        patientId: 'P001',
+        bloodPressure: '120/80',
+        heartRate: 72,
+        temperature: 36.8,
+        weight: 75.5,
+        height: 175,
+        recordedAt: '2024-03-15T10:00:00Z',
+        recordedBy: '1',
+      },
+      {
+        id: 'V002',
+        patientId: 'P001',
+        bloodPressure: '118/78',
+        heartRate: 70,
+        temperature: 36.7,
+        weight: 75.2,
+        height: 175,
+        recordedAt: '2024-03-10T14:30:00Z',
+        recordedBy: '1',
+      },
+    ];
+    await storage.setData(storage.KEYS.VITAL_SIGNS, testVitals);
+  }
+
+  const existingAllergies = await storage.getData<PatientAllergy[]>(storage.KEYS.ALLERGIES);
+  if (!existingAllergies || existingAllergies.length === 0) {
+    const testAllergies: PatientAllergy[] = [
+      {
+        id: 'A001',
+        patientId: 'P001',
+        allergen: 'Penicillin',
+        severity: 'high',
+        reaction: 'Skin rash and difficulty breathing',
+        recordedAt: '2024-01-05T00:00:00Z',
+      },
+      {
+        id: 'A002',
+        patientId: 'P002',
+        allergen: 'Peanuts',
+        severity: 'medium',
+        reaction: 'Hives',
+        recordedAt: '2024-02-10T00:00:00Z',
+      },
+    ];
+    await storage.setData(storage.KEYS.ALLERGIES, testAllergies);
+  }
+}

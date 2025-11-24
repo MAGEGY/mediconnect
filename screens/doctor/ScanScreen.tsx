@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Pressable, Alert, Linking } from 'react-native';
+import { View, StyleSheet, Text, Pressable, Alert, Linking, Modal, TextInput } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Card } from '@/components/Card';
 import { useTheme } from '@/hooks/useTheme';
 import { Spacing, BorderRadius } from '@/constants/theme';
 import { patientService } from '@/utils/data';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { DoctorStackParamList } from '@/navigation/DoctorStackNavigator';
+
+type NavigationProp = NativeStackNavigationProp<DoctorStackParamList>;
 
 export default function ScanScreen() {
+  const navigation = useNavigation<NavigationProp>();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
-  const [manualId, setManualId] = useState('');
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     requestPermission();
@@ -32,15 +39,23 @@ export default function ScanScreen() {
     if (scanned) return;
     setScanned(true);
     
-    const patientId = data.replace('medrecord://patient/', '');
-    const patient = await patientService.getById(patientId);
+    const scannedId = data.startsWith('medrecord://patient/') 
+      ? data.replace('medrecord://patient/', '') 
+      : data;
+    const patient = await patientService.getById(scannedId);
     
     if (patient) {
       Alert.alert(
         'Patient Found',
         `${patient.displayName}\nID: ${patient.id}`,
         [
-          { text: 'View Records', onPress: () => {} },
+          { 
+            text: 'View Records', 
+            onPress: () => {
+              navigation.navigate('PatientDetail', { patientId: patient.id });
+              setScanned(false);
+            } 
+          },
           { text: 'Scan Again', onPress: () => setScanned(false) },
         ]
       );
@@ -51,20 +66,23 @@ export default function ScanScreen() {
     }
   };
 
-  const handleManualEntry = async () => {
-    if (!manualId.trim()) {
+  const handleManualEntry = async (inputId: string) => {
+    if (!inputId || !inputId.trim()) {
       Alert.alert('Error', 'Please enter a patient ID');
+      setShowManualEntry(false);
+      setInputValue('');
+      setScanned(false);
       return;
     }
 
-    const patient = await patientService.getById(manualId.trim());
+    const patient = await patientService.getById(inputId.trim());
+    
+    setShowManualEntry(false);
+    setInputValue('');
+    setScanned(false);
     
     if (patient) {
-      Alert.alert(
-        'Patient Found',
-        `${patient.displayName}\nID: ${patient.id}`,
-        [{ text: 'OK' }]
-      );
+      navigation.navigate('PatientDetail', { patientId: patient.id });
     } else {
       Alert.alert('Error', 'Patient not found');
     }
@@ -135,18 +153,7 @@ export default function ScanScreen() {
 
           <Pressable
             style={[styles.actionButton, { backgroundColor: theme.surface }]}
-            onPress={() => Alert.alert('Manual Entry', 'Enter patient ID manually', [
-              { text: 'Cancel' },
-              {
-                text: 'Enter',
-                onPress: () => {
-                  Alert.prompt('Patient ID', 'Enter the patient ID:', [
-                    { text: 'Cancel' },
-                    { text: 'Submit', onPress: handleManualEntry },
-                  ]);
-                },
-              },
-            ])}
+            onPress={() => setShowManualEntry(true)}
           >
             <MaterialCommunityIcons name="keyboard" size={24} color={theme.primary} />
             <ThemedText style={[styles.actionText, { color: theme.primary }]}>
@@ -155,6 +162,62 @@ export default function ScanScreen() {
           </Pressable>
         </View>
       </View>
+
+      <Modal
+        visible={showManualEntry}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setShowManualEntry(false);
+          setInputValue('');
+          setScanned(false);
+        }}
+      >
+        <Pressable 
+          style={styles.modalOverlay}
+          onPress={() => {
+            setShowManualEntry(false);
+            setInputValue('');
+            setScanned(false);
+          }}
+        >
+          <Pressable onPress={(e) => e.stopPropagation()}>
+            <Card style={[styles.modalCard, { backgroundColor: theme.surface }]}>
+              <ThemedText style={styles.modalTitle}>Enter Patient ID</ThemedText>
+              <TextInput
+                style={[styles.modalInput, { backgroundColor: theme.backgroundSecondary, color: theme.text }]}
+                value={inputValue}
+                onChangeText={setInputValue}
+                placeholder="Patient ID or National ID"
+                placeholderTextColor={theme.textSecondary}
+                autoFocus
+              />
+              <View style={styles.modalButtons}>
+                <Pressable
+                  style={[styles.modalButton, { backgroundColor: theme.backgroundSecondary }]}
+                  onPress={() => {
+                    setShowManualEntry(false);
+                    setInputValue('');
+                    setScanned(false);
+                  }}
+                >
+                  <ThemedText style={[styles.modalButtonText, { color: theme.text }]}>
+                    Cancel
+                  </ThemedText>
+                </Pressable>
+                <Pressable
+                  style={[styles.modalButton, { backgroundColor: theme.primary }]}
+                  onPress={() => handleManualEntry(inputValue)}
+                >
+                  <ThemedText style={[styles.modalButtonText, { color: theme.buttonText }]}>
+                    Search
+                  </ThemedText>
+                </Pressable>
+              </View>
+            </Card>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </ThemedView>
   );
 }
@@ -228,6 +291,44 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   actionText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.xl,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 400,
+    padding: Spacing.xl,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: Spacing.lg,
+  },
+  modalInput: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    fontSize: 14,
+    marginBottom: Spacing.lg,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.sm,
+    alignItems: 'center',
+  },
+  modalButtonText: {
     fontSize: 14,
     fontWeight: '500',
   },
