@@ -134,7 +134,9 @@ export default function PatientDetailScreen({ route, navigation }: Props) {
                       <MaterialCommunityIcons name="heart-pulse" size={24} color={theme.primary} />
                       <ThemedText style={[styles.vitalLabel, { color: theme.textSecondary }]}>BP</ThemedText>
                       <ThemedText style={styles.vitalValue}>
-                        {vital.bloodPressure || 'N/A'}
+                        {vital.bloodPressureSystolic && vital.bloodPressureDiastolic 
+                          ? `${vital.bloodPressureSystolic}/${vital.bloodPressureDiastolic}` 
+                          : 'N/A'}
                       </ThemedText>
                     </View>
                     <View style={styles.vitalItem}>
