@@ -54,7 +54,8 @@ Comprehensive Android medical records and prescription management application wi
 │   ├── ThemedText.tsx
 │   └── ThemedView.tsx
 ├── constants/              # Theme and constants
-│   └── theme.ts
+│   ├── theme.ts
+│   └── medicinesDatabase.ts  # 6,522-medicine comprehensive database
 ├── contexts/               # React contexts
 │   └── AuthContext.tsx    # Authentication state management
 ├── hooks/                  # Custom React hooks
@@ -75,7 +76,13 @@ Comprehensive Android medical records and prescription management application wi
 │   └── index.ts
 ├── utils/                  # Utility functions
 │   ├── data.ts            # Data services and mock data
-│   └── storage.ts         # AsyncStorage wrapper
+│   ├── storage.ts         # AsyncStorage wrapper
+│   └── medicineNormalization.ts  # Trade name normalization
+├── scripts/                # Build and data processing scripts
+│   └── convert_excel_to_db.py  # Excel to TypeScript converter
+├── assets/                 # Static assets
+│   ├── medicines_full_database.csv  # Medicine database backup
+│   └── medicines_tradenames.csv     # Trade name mappings
 └── design_guidelines.md   # Design and implementation guidelines
 ```
 
@@ -91,14 +98,17 @@ All data services are in `utils/data.ts`:
 - `allergyService`: Patient allergy management
 
 ## Recent Changes (November 24, 2025)
+- **MAJOR: Comprehensive Medicine Database**: Upgraded from 56-medicine sample to **6,522 real medicines** extracted from tarshouby.xlsx Excel file
+- **Python Conversion Script**: Created automated script (scripts/convert_excel_to_db.py) to extract medicine data into TypeScript constants
+- **Medicine Database Structure**: Each medicine now has id, name, genericName, tradeName, strength, dosageForm, fullProductName, manufacturer
+- **Database Backup**: CSV backup created at assets/medicines_full_database.csv for reference
 - **Drug Interaction System**: Integrated OpenFDA Drug API for real-time drug interaction checking
 - **Medicine Normalization**: Built service to map trade names to generic names using local CSV database
 - **Doctor Override System**: Implemented cross-platform override workflow with mandatory justification (10+ chars)
 - **TextInputModal Component**: Created Android-compatible alternative to iOS-only Alert.prompt
 - **Navigation Fixes**: Fixed patient card navigation to PatientDetailScreen
 - **Card Component**: Fixed to properly render children instead of placeholder text
-- **Type Fixes**: Corrected VitalSign bloodPressure field reference in PatientDetailScreen
-- **CSV Medicine Database**: 56 trade name mappings in assets/medicines_tradenames.csv
+- **Type Fixes**: Corrected VitalSign bloodPressure field reference in PatientDetailScreen (bloodPressureSystolic/Diastolic)
 - **No Emojis**: All emoji usage removed from UI, replaced with text-based severity labels
 - Fixed useScreenInsets hook to support screens outside tab navigator context
 - Implemented real user authentication with SHA-256 password hashing with per-user salts
@@ -109,23 +119,23 @@ All data services are in `utils/data.ts`:
 
 ## Known Limitations
 - All data is stored locally in AsyncStorage (no backend/cloud sync)
-- Medicine database currently uses 56 common medications from CSV - needs expansion with real data
+- Minor LSP errors in mock data (medicineName vs medicines array, severity types) - low priority as mock data only used when database is empty
 - SMS integration not yet implemented  
 - OCR functionality not yet implemented
 - No real-time notifications
 - Prescription viewing in PatientDetailScreen needs testing on physical Android device
 
 ## Next Steps
-1. **URGENT**: Replace CSV medicine database with real data from tarshouby.xlsx file
-2. Complete prescription dispensing flow in PharmacistTabNavigator with partial dispensing
-3. Build medicine inventory management forms for pharmacists
-4. Implement culturally-tailored medical advice system
-5. Add QR code generation for patient IDs and prescriptions
-6. Integrate SMS functionality via Twilio for prescription sharing
-7. Add OCR for medicine boxes and prescriptions using expo-image-manipulator
-8. Implement push notifications for prescription alerts
-9. Build analytics dashboard for doctors
-10. Test all workflows on physical Android device via Expo Go
+1. Complete prescription dispensing flow in PharmacistTabNavigator with partial dispensing
+2. Build medicine inventory management forms for pharmacists
+3. Implement culturally-tailored medical advice system
+4. Add QR code generation for patient IDs and prescriptions
+5. Integrate SMS functionality via Twilio for prescription sharing
+6. Add OCR for medicine boxes and prescriptions using expo-image-manipulator
+7. Implement push notifications for prescription alerts
+8. Build analytics dashboard for doctors
+9. Test all workflows on physical Android device via Expo Go
+10. Optional: Expand medicine database with additional trade name mappings if needed
 
 ## User Preferences
 - Material Design 3 aesthetic for Android
