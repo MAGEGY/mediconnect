@@ -102,6 +102,7 @@ All data services are in `utils/data.ts`:
 - **Python Conversion Script**: Created automated script (scripts/convert_excel_to_db.py) to extract medicine data into TypeScript constants
 - **Medicine Database Structure**: Each medicine now has id, name, genericName, tradeName, strength, dosageForm, fullProductName, manufacturer
 - **Database Backup**: CSV backup created at assets/medicines_full_database.csv for reference
+- **Mock Data Fixes**: Fixed outdated prescription and vital signs mock data to match current interfaces (medicines array, bloodPressureSystolic/Diastolic)
 - **Drug Interaction System**: Integrated OpenFDA Drug API for real-time drug interaction checking
 - **Medicine Normalization**: Built service to map trade names to generic names using local CSV database
 - **Doctor Override System**: Implemented cross-platform override workflow with mandatory justification (10+ chars)
@@ -119,11 +120,10 @@ All data services are in `utils/data.ts`:
 
 ## Known Limitations
 - All data is stored locally in AsyncStorage (no backend/cloud sync)
-- Minor LSP errors in mock data (medicineName vs medicines array, severity types) - low priority as mock data only used when database is empty
 - SMS integration not yet implemented  
 - OCR functionality not yet implemented
 - No real-time notifications
-- Prescription viewing in PatientDetailScreen needs testing on physical Android device
+- All workflows need comprehensive testing on physical Android device via Expo Go
 
 ## Next Steps
 1. Complete prescription dispensing flow in PharmacistTabNavigator with partial dispensing
