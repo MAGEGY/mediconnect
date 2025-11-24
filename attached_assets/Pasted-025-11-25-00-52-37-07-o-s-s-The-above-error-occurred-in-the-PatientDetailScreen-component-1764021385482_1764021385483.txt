@@ -1,0 +1,50 @@
+025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+2025-11-25 00:52:37.07
+%o %s %s
+{}
+The above error occurred in the <PatientDetailScreen> component.
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.

@@ -440,6 +440,7 @@ export async function createTestDataIfEmpty() {
         weight: 75.5,
         height: 175,
         recordedAt: '2024-03-15T10:00:00Z',
+        recordedBy: '1',
       },
       {
         id: 'V002',
@@ -451,6 +452,7 @@ export async function createTestDataIfEmpty() {
         weight: 75.2,
         height: 175,
         recordedAt: '2024-03-10T14:30:00Z',
+        recordedBy: '1',
       },
     ];
     await storage.setData(storage.KEYS.VITAL_SIGNS, testVitals);
