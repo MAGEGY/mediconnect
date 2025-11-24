@@ -1,6 +1,8 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DoctorTabNavigator from './DoctorTabNavigator';
+import PatientDetailScreen from '@/screens/doctor/PatientDetailScreen';
+import CreatePrescriptionScreen from '@/screens/doctor/CreatePrescriptionScreen';
 import { User } from '@/types';
 
 export type DoctorStackParamList = {
@@ -25,14 +27,14 @@ export default function DoctorStackNavigator() {
       />
       <Stack.Screen
         name="PatientDetail"
-        component={require('@/screens/doctor/PatientDetailScreen').default}
+        component={PatientDetailScreen}
         options={{
           title: 'Patient Details',
         }}
       />
       <Stack.Screen
         name="CreatePrescription"
-        component={require('@/screens/doctor/CreatePrescriptionScreen').default}
+        component={CreatePrescriptionScreen}
         options={{
           title: 'New Prescription',
         }}
