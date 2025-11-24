@@ -23,7 +23,10 @@ export default function LoginScreen({ navigation }: any) {
 
     setLoading(true);
     try {
-      await login(username, password);
+      const success = await login(username, password);
+      if (!success) {
+        Alert.alert('Login Failed', 'Invalid credentials or account not approved');
+      }
     } catch (error) {
       Alert.alert('Error', 'Login failed. Please try again.');
     } finally {
