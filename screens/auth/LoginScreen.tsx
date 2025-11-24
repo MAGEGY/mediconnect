@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ScreenKeyboardAwareScrollView } from '@/components/ScreenKeyboardAwareScrollView';
 import { useTheme } from '@/hooks/useTheme';
+import { storage } from '@/utils/storage';
 import { Spacing, BorderRadius } from '@/constants/theme';
 
 export default function LoginScreen({ navigation }: any) {
@@ -35,9 +36,15 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   const handleBiometricLogin = async () => {
+    const savedUser = await storage.getUser();
+    if (!savedUser) {
+      Alert.alert('Biometric Setup Required', 'Please login with your credentials first to enable biometric authentication.');
+      return;
+    }
+
     const success = await authenticateWithBiometric();
-    if (success) {
-      await login('biometric_user', 'biometric');
+    if (!success) {
+      Alert.alert('Authentication Failed', 'Biometric authentication was not successful.');
     }
   };
 

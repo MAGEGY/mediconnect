@@ -92,9 +92,9 @@ export const userService = {
 
   async createTestUsers(): Promise<void> {
     const testUsers = [
-      { username: 'doctor1', phoneNumber: '+1234567890', nationalId: 'DOC001', displayName: 'Dr. Sarah Johnson', role: 'doctor' as const, password: 'password123' },
-      { username: 'patient1', phoneNumber: '+1234567891', nationalId: 'PAT001', displayName: 'John Doe', role: 'patient' as const, password: 'password123' },
-      { username: 'pharmacist1', phoneNumber: '+1234567892', nationalId: 'PHA001', displayName: 'Emily Davis', role: 'pharmacist' as const, password: 'password123' },
+      { username: 'doctor1', phoneNumber: '+1234567890', nationalId: 'DOC001', displayName: 'Dr. Sarah Johnson', role: 'doctor' as const, password: 'Doctor123!' },
+      { username: 'patient1', phoneNumber: '+1234567891', nationalId: 'PAT001', displayName: 'John Doe', role: 'patient' as const, password: 'Patient123!' },
+      { username: 'pharmacist1', phoneNumber: '+1234567892', nationalId: 'PHA001', displayName: 'Emily Davis', role: 'pharmacist' as const, password: 'Pharma123!' },
     ];
 
     for (const testUser of testUsers) {

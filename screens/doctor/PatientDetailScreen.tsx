@@ -56,17 +56,20 @@ export default function PatientDetailScreen({ route, navigation }: Props) {
     setAllergies(patientAllergies);
   };
 
-  if (!patient) {
-    return (
-      <ScreenScrollView>
-        <View style={styles.container}>
-          <ThemedText>Loading patient data...</ThemedText>
-        </View>
-      </ScreenScrollView>
-    );
-  }
 
   const renderTabContent = () => {
+    if (!patient) {
+      return (
+        <View style={styles.tabContent}>
+          <Card>
+            <ThemedText style={[styles.emptyText, { color: theme.textSecondary }]}>
+              Loading patient data...
+            </ThemedText>
+          </Card>
+        </View>
+      );
+    }
+
     switch (activeTab) {
       case 'overview':
         return (

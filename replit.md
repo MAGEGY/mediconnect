@@ -97,7 +97,20 @@ All data services are in `utils/data.ts`:
 - `dispensingService`: Dispensing records
 - `allergyService`: Patient allergy management
 
+## Test Credentials
+- **Doctor**: username: `doctor1`, password: `Doctor123!`
+- **Patient**: username: `patient1`, password: `Patient123!`
+- **Pharmacist**: username: `pharmacist1`, password: `Pharma123!`
+
 ## Recent Changes (November 24, 2025)
+- **Authentication Fixes** (Nov 24, 2025 - Latest):
+  - Fixed test user passwords: doctor1/Doctor123!, patient1/Patient123!, pharmacist1/Pharma123!
+  - Fixed biometric login to check for existing logged-in user instead of non-existent 'biometric_user'
+  - Fixed login to show proper error message when credentials are invalid or account not approved
+- **PatientDetailScreen Hook Error Fixed** (Nov 24, 2025):
+  - Removed early return that violated React hook rules
+  - Loading state now handled within main render flow
+  - ScreenScrollView always at component root as required
 - **MAJOR: Comprehensive Medicine Database**: Upgraded from 56-medicine sample to **6,522 real medicines** extracted from tarshouby.xlsx Excel file
 - **Python Conversion Script**: Created automated script (scripts/convert_excel_to_db.py) to extract medicine data into TypeScript constants
 - **Medicine Database Structure**: Each medicine now has id, name, genericName, tradeName, strength, dosageForm, fullProductName, manufacturer
