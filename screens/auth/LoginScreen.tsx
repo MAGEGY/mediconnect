@@ -147,10 +147,10 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: Spacing.inputHeight,
-    paddingLeft: Spacing['5xl'],
+    paddingLeft: Spacing['4xl'],
     paddingRight: Spacing.lg,
     borderRadius: BorderRadius.sm,
-    fontSize: 16,
+    fontSize: 15,
   },
   button: {
     height: Spacing.buttonHeight,

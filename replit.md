@@ -103,7 +103,16 @@ All data services are in `utils/data.ts`:
 - **Pharmacist**: username: `pharmacist1`, password: `Pharma123!`
 
 ## Recent Changes (November 24, 2025)
-- **Authentication Fixes** (Nov 24, 2025 - Latest):
+- **Login Screen Text Overflow Fix** (Nov 24, 2025 - Latest):
+  - Reduced left padding from 48px to 40px for better text accommodation
+  - Reduced font size from 16px to 15px to prevent text cutoff
+  - Ensures username/phone number displays properly without overflow
+- **APK Build Guide Created** (Nov 24, 2025):
+  - Comprehensive guide for building Android APK using EAS Build
+  - Instructions for local builds and development builds
+  - Google Play Store publishing guidance
+  - See BUILD_APK_GUIDE.md for complete instructions
+- **Authentication Fixes** (Nov 24, 2025):
   - Fixed test user passwords: doctor1/Doctor123!, patient1/Patient123!, pharmacist1/Pharma123!
   - Fixed biometric login to check for existing logged-in user instead of non-existent 'biometric_user'
   - Fixed login to show proper error message when credentials are invalid or account not approved
