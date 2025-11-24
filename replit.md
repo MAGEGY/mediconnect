@@ -138,6 +138,18 @@ All data services are in `utils/data.ts`:
 - No real-time notifications
 - All workflows need comprehensive testing on physical Android device via Expo Go
 
+## Latest Features (November 24, 2025)
+- **Manual Patient Registration**: Doctors can now manually add patients via a floating action button (FAB) on the Patients screen when QR code or patient record is unavailable
+  - Comprehensive validation for all fields (name, phone, national ID, username, password)
+  - Error messages clear on input change for better UX
+  - Haptic feedback on FAB press
+  - Automatic patient list refresh after registration
+  - Accessibility labels for screen readers
+- **Icon Size Standardization**: Created `IconSize` constants for consistent icon sizing across mobile screens (16px to 64px range)
+  - Better touch targets for mobile (minimum 48dp)
+  - Improved visual hierarchy with standardized sizes
+  - Applied to PatientsScreen, PatientDetailScreen, ProfileScreen, and AddPatientScreen
+
 ## Next Steps
 1. Complete prescription dispensing flow in PharmacistTabNavigator with partial dispensing
 2. Build medicine inventory management forms for pharmacists
@@ -147,7 +159,10 @@ All data services are in `utils/data.ts`:
 6. Add OCR for medicine boxes and prescriptions using expo-image-manipulator
 7. Implement push notifications for prescription alerts
 8. Build analytics dashboard for doctors
-9. Test all workflows on physical Android device via Expo Go
+9. **TEST ALL FEATURES**: Scan QR code with Expo Go on physical Android device to test:
+   - Manual patient registration flow
+   - Icon sizing and mobile UX improvements
+   - All authentication fixes (Doctor123!, Patient123!, Pharma123!)
 10. Optional: Expand medicine database with additional trade name mappings if needed
 
 ## User Preferences

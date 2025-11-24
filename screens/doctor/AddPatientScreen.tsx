@@ -144,6 +144,8 @@ export default function AddPatientScreen() {
                   setErrors({ ...errors, displayName: '' });
                 }
               }}
+              editable={!loading}
+              autoComplete="name"
             />
             {errors.displayName ? (
               <ThemedText style={[styles.errorText, { color: theme.error }]}>
@@ -175,6 +177,8 @@ export default function AddPatientScreen() {
                 }
               }}
               keyboardType="phone-pad"
+              editable={!loading}
+              autoComplete="tel"
             />
             {errors.phoneNumber ? (
               <ThemedText style={[styles.errorText, { color: theme.error }]}>
@@ -205,6 +209,7 @@ export default function AddPatientScreen() {
                   setErrors({ ...errors, nationalId: '' });
                 }
               }}
+              editable={!loading}
             />
             {errors.nationalId ? (
               <ThemedText style={[styles.errorText, { color: theme.error }]}>
@@ -240,6 +245,8 @@ export default function AddPatientScreen() {
                 }
               }}
               autoCapitalize="none"
+              editable={!loading}
+              autoComplete="username"
             />
             {errors.username ? (
               <ThemedText style={[styles.errorText, { color: theme.error }]}>
@@ -271,6 +278,8 @@ export default function AddPatientScreen() {
                 }
               }}
               secureTextEntry
+              editable={!loading}
+              autoComplete="password-new"
             />
             {errors.password ? (
               <ThemedText style={[styles.errorText, { color: theme.error }]}>
@@ -302,6 +311,8 @@ export default function AddPatientScreen() {
                 }
               }}
               secureTextEntry
+              editable={!loading}
+              autoComplete="password-new"
             />
             {errors.confirmPassword ? (
               <ThemedText style={[styles.errorText, { color: theme.error }]}>
