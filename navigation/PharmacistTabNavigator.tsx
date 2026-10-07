@@ -1,13 +1,15 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { Platform, StyleSheet } from 'react-native';
-import { useTheme } from '@/hooks/useTheme';
-import DispenseScreen from '@/screens/pharmacist/DispenseScreen';
-import InventoryScreen from '@/screens/pharmacist/InventoryScreen';
-import HistoryScreen from '@/screens/pharmacist/HistoryScreen';
-import ProfileScreen from '@/screens/shared/ProfileScreen';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { Platform, StyleSheet } from "react-native";
+import { useTheme } from "@/hooks/useTheme";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import DispenseScreen from "@/screens/pharmacist/DispenseScreen";
+import InventoryScreen from "@/screens/pharmacist/InventoryScreen";
+import HistoryScreen from "@/screens/pharmacist/HistoryScreen";
+import ProfileScreen from "@/screens/shared/ProfileScreen";
 
 export type PharmacistTabParamList = {
   Dispense: undefined;
@@ -20,6 +22,7 @@ const Tab = createBottomTabNavigator<PharmacistTabParamList>();
 
 export default function PharmacistTabNavigator() {
   const { theme, isDark } = useTheme();
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   return (
     <Tab.Navigator
@@ -28,19 +31,19 @@ export default function PharmacistTabNavigator() {
         tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
-          position: 'absolute',
+          position: "absolute",
           backgroundColor: Platform.select({
-            ios: 'transparent',
+            ios: "transparent",
             android: theme.backgroundRoot,
           }),
           borderTopWidth: 0,
           elevation: 0,
         },
         tabBarBackground: () =>
-          Platform.OS === 'ios' ? (
+          Platform.OS === "ios" ? (
             <BlurView
               intensity={100}
-              tint={isDark ? 'dark' : 'light'}
+              tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
           ) : null,
@@ -55,9 +58,13 @@ export default function PharmacistTabNavigator() {
         name="Dispense"
         component={DispenseScreen}
         options={{
-          title: 'Dispense',
+          title: "Dispense",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="qrcode-scan" size={size} color={color} />
+            <MaterialCommunityIcons
+              name="qrcode-scan"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
@@ -65,9 +72,13 @@ export default function PharmacistTabNavigator() {
         name="Inventory"
         component={InventoryScreen}
         options={{
-          title: 'Inventory',
+          title: "Inventory",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="package-variant" size={size} color={color} />
+            <MaterialCommunityIcons
+              name="package-variant"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
@@ -75,7 +86,7 @@ export default function PharmacistTabNavigator() {
         name="History"
         component={HistoryScreen}
         options={{
-          title: 'History',
+          title: "History",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="history" size={size} color={color} />
           ),
@@ -84,10 +95,16 @@ export default function PharmacistTabNavigator() {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate("Settings");
+          },
+        }}
         options={{
-          title: 'Profile',
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="user" size={size} color={color} />
+            <MaterialCommunityIcons name="cog" size={size} color={color} />
           ),
         }}
       />

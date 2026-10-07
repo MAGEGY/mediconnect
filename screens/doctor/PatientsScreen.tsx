@@ -1,31 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TextInput, Pressable, FlatList, Image } from 'react-native';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius, Shadows, IconSize } from '@/constants/theme';
-import { patientService } from '@/utils/data';
-import { User } from '@/types';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { DoctorStackParamList } from '@/navigation/DoctorStackNavigator';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  FlatList,
+  Image,
+} from "react-native";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/hooks/useTheme";
+import { Spacing, BorderRadius, Shadows, IconSize } from "@/constants/theme";
+import { patientService } from "@/utils/data";
+import { User } from "@/types";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { DoctorStackParamList } from "@/navigation/DoctorStackNavigator";
 
 const AVATARS = [
-  require('@/assets/avatars/stethoscope.png'),
-  require('@/assets/avatars/medical-cross.png'),
-  require('@/assets/avatars/heartbeat.png'),
+  require("@/assets/avatars/stethoscope.png"),
+  require("@/assets/avatars/medical-cross.png"),
+  require("@/assets/avatars/heartbeat.png"),
 ];
 
 export default function PatientsScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<DoctorStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<DoctorStackParamList>>();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [patients, setPatients] = useState<User[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,14 +45,15 @@ export default function PatientsScreen() {
   useFocusEffect(
     React.useCallback(() => {
       loadPatients();
-    }, [])
+    }, []),
   );
 
   useEffect(() => {
     if (searchQuery) {
-      const filtered = patients.filter(p =>
-        p.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.id.toLowerCase().includes(searchQuery.toLowerCase())
+      const filtered = patients.filter(
+        (p) =>
+          p.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.id.toLowerCase().includes(searchQuery.toLowerCase()),
       );
       setFilteredPatients(filtered);
     } else {
@@ -58,7 +67,7 @@ export default function PatientsScreen() {
       setPatients(data);
       setFilteredPatients(data);
     } catch (error) {
-      console.error('Error loading patients:', error);
+      console.error("Error loading patients:", error);
     } finally {
       setLoading(false);
     }
@@ -66,9 +75,11 @@ export default function PatientsScreen() {
 
   const renderPatientCard = ({ item }: { item: User }) => (
     <Pressable
-      onPress={() => navigation.navigate('PatientDetail', { patientId: item.id })}
+      onPress={() =>
+        navigation.navigate("PatientDetail", { patientId: item.id })
+      }
       style={[styles.patientCard, { backgroundColor: theme.surface }]}
-      android_ripple={{ color: theme.primary + '20' }}
+      android_ripple={{ color: theme.primary + "20" }}
     >
       <Image source={AVATARS[item.avatarIndex]} style={styles.avatar} />
       <View style={styles.patientInfo}>
@@ -78,31 +89,46 @@ export default function PatientsScreen() {
         <ThemedText style={[styles.patientId, { color: theme.textSecondary }]}>
           ID: {item.id}
         </ThemedText>
-        <ThemedText style={[styles.patientPhone, { color: theme.textSecondary }]}>
+        <ThemedText
+          style={[styles.patientPhone, { color: theme.textSecondary }]}
+        >
           {item.phoneNumber}
         </ThemedText>
       </View>
-      <MaterialCommunityIcons name="chevron-right" size={IconSize.md} color={theme.textSecondary} />
+      <MaterialCommunityIcons
+        name="chevron-right"
+        size={IconSize.md}
+        color={theme.textSecondary}
+      />
     </Pressable>
   );
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Image
-        source={require('@/assets/illustrations/no-patients.png')}
+        source={require("@/assets/illustrations/no-patients.png")}
         style={styles.emptyImage}
       />
       <ThemedText style={[styles.emptyText, { color: theme.textSecondary }]}>
-        {searchQuery ? 'No patients found' : 'No patients registered yet'}
+        {searchQuery ? "No patients found" : "No patients registered yet"}
       </ThemedText>
     </View>
   );
 
   return (
     <ThemedView style={styles.container}>
-      <View style={[styles.searchContainer, { backgroundColor: theme.backgroundDefault }]}>
+      <View
+        style={[
+          styles.searchContainer,
+          { backgroundColor: theme.backgroundDefault },
+        ]}
+      >
         <View style={[styles.searchBar, { backgroundColor: theme.surface }]}>
-          <Feather name="search" size={IconSize.sm} color={theme.textSecondary} />
+          <Feather
+            name="search"
+            size={IconSize.sm}
+            color={theme.textSecondary}
+          />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
             placeholder="Search patients..."
@@ -119,13 +145,16 @@ export default function PatientsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[
           styles.listContent,
-          { paddingBottom: tabBarHeight + Spacing.xl + Spacing['5xl'] + Spacing.lg },
+          {
+            paddingBottom:
+              tabBarHeight + Spacing.xl + Spacing["5xl"] + Spacing.lg,
+          },
         ]}
         ListEmptyComponent={renderEmptyState}
         refreshing={loading}
         onRefresh={loadPatients}
       />
-      
+
       <Pressable
         style={[
           styles.fab,
@@ -136,13 +165,17 @@ export default function PatientsScreen() {
         ]}
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          navigation.navigate('AddPatient');
+          navigation.navigate("AddPatient");
         }}
-        android_ripple={{ color: theme.buttonText + '40', radius: 28 }}
+        android_ripple={{ color: theme.buttonText + "40", radius: 28 }}
         accessibilityLabel="Add new patient"
         accessibilityRole="button"
       >
-        <MaterialCommunityIcons name="plus" size={IconSize.lg} color={theme.buttonText} />
+        <MaterialCommunityIcons
+          name="plus"
+          size={IconSize.lg}
+          color={theme.buttonText}
+        />
       </Pressable>
     </ThemedView>
   );
@@ -156,8 +189,8 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: Spacing.lg,
     height: Spacing.inputHeight,
     borderRadius: BorderRadius.sm,
@@ -171,8 +204,8 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
   },
   patientCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: Spacing.lg,
     borderRadius: BorderRadius.sm,
     marginBottom: Spacing.md,
@@ -189,7 +222,7 @@ const styles = StyleSheet.create({
   },
   patientName: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: Spacing.xs,
   },
   patientId: {
@@ -200,9 +233,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing['5xl'],
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing["5xl"],
   },
   emptyImage: {
     width: 200,
@@ -214,15 +247,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   fab: {
-    position: 'absolute',
+    position: "absolute",
     right: Spacing.xl,
     width: 56,
     height: 56,
     borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     elevation: 6,
-    shadowColor: '#000000',
+    shadowColor: "#000000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

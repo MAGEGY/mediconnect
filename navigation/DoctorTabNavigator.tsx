@@ -1,14 +1,17 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { Platform, StyleSheet } from 'react-native';
-import { useTheme } from '@/hooks/useTheme';
-import PatientsScreen from '@/screens/doctor/PatientsScreen';
-import ScanScreen from '@/screens/doctor/ScanScreen';
-import PrescriptionsScreen from '@/screens/doctor/PrescriptionsScreen';
-import DatabaseScreen from '@/screens/doctor/DatabaseScreen';
-import ProfileScreen from '@/screens/shared/ProfileScreen';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { Platform, StyleSheet } from "react-native";
+import { useTheme } from "@/hooks/useTheme";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import PatientsScreen from "@/screens/doctor/PatientsScreen";
+import ScanScreen from "@/screens/doctor/ScanScreen";
+import PrescriptionsScreen from "@/screens/doctor/PrescriptionsScreen";
+import DatabaseScreen from "@/screens/doctor/DatabaseScreen";
+import ProfileScreen from "@/screens/shared/ProfileScreen";
+import SettingsScreen from "@/screens/shared/SettingsScreen";
 
 export type DoctorTabParamList = {
   Patients: undefined;
@@ -22,6 +25,7 @@ const Tab = createBottomTabNavigator<DoctorTabParamList>();
 
 export default function DoctorTabNavigator() {
   const { theme, isDark } = useTheme();
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   return (
     <Tab.Navigator
@@ -30,19 +34,19 @@ export default function DoctorTabNavigator() {
         tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
-          position: 'absolute',
+          position: "absolute",
           backgroundColor: Platform.select({
-            ios: 'transparent',
+            ios: "transparent",
             android: theme.backgroundRoot,
           }),
           borderTopWidth: 0,
           elevation: 0,
         },
         tabBarBackground: () =>
-          Platform.OS === 'ios' ? (
+          Platform.OS === "ios" ? (
             <BlurView
               intensity={100}
-              tint={isDark ? 'dark' : 'light'}
+              tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
           ) : null,
@@ -57,9 +61,13 @@ export default function DoctorTabNavigator() {
         name="Patients"
         component={PatientsScreen}
         options={{
-          title: 'Patients',
+          title: "Patients",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-multiple" size={size} color={color} />
+            <MaterialCommunityIcons
+              name="account-multiple"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
@@ -67,9 +75,13 @@ export default function DoctorTabNavigator() {
         name="Scan"
         component={ScanScreen}
         options={{
-          title: 'Scan',
+          title: "Scan",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="qrcode-scan" size={size} color={color} />
+            <MaterialCommunityIcons
+              name="qrcode-scan"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
@@ -77,9 +89,13 @@ export default function DoctorTabNavigator() {
         name="Prescriptions"
         component={PrescriptionsScreen}
         options={{
-          title: 'Prescriptions',
+          title: "Prescriptions",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="file-document" size={size} color={color} />
+            <MaterialCommunityIcons
+              name="file-document"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
@@ -87,7 +103,7 @@ export default function DoctorTabNavigator() {
         name="Database"
         component={DatabaseScreen}
         options={{
-          title: 'Database',
+          title: "Database",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="database" size={size} color={color} />
           ),
@@ -96,10 +112,16 @@ export default function DoctorTabNavigator() {
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate("Settings");
+          },
+        }}
         options={{
-          title: 'Profile',
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="user" size={size} color={color} />
+            <MaterialCommunityIcons name="cog" size={size} color={color} />
           ),
         }}
       />

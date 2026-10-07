@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, TextInput, Pressable, Modal, StyleSheet } from 'react-native';
-import { ThemedText } from './ThemedText';
-import { ThemedView } from './ThemedView';
-import { Card } from './Card';
-import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius } from '@/constants/theme';
+import React, { useState } from "react";
+import { View, TextInput, Pressable, Modal, StyleSheet } from "react-native";
+import { ThemedText } from "./ThemedText";
+import { ThemedView } from "./ThemedView";
+import { Card } from "./Card";
+import { useTheme } from "@/hooks/useTheme";
+import { Spacing, BorderRadius } from "@/constants/theme";
 
 interface TextInputModalProps {
   visible: boolean;
@@ -20,14 +20,14 @@ export function TextInputModal({
   visible,
   title,
   message,
-  placeholder = '',
+  placeholder = "",
   minLength = 0,
   onSubmit,
   onCancel,
 }: TextInputModalProps) {
   const { theme } = useTheme();
-  const [text, setText] = useState('');
-  const [error, setError] = useState('');
+  const [text, setText] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = () => {
     if (minLength > 0 && text.trim().length < minLength) {
@@ -35,13 +35,13 @@ export function TextInputModal({
       return;
     }
     onSubmit(text.trim());
-    setText('');
-    setError('');
+    setText("");
+    setError("");
   };
 
   const handleCancel = () => {
-    setText('');
-    setError('');
+    setText("");
+    setError("");
     onCancel();
   };
 
@@ -73,7 +73,7 @@ export function TextInputModal({
             value={text}
             onChangeText={(value) => {
               setText(value);
-              setError('');
+              setError("");
             }}
             multiline
             numberOfLines={4}
@@ -110,18 +110,18 @@ export function TextInputModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
     padding: Spacing.xl,
   },
   modal: {
-    width: '100%',
+    width: "100%",
     maxWidth: 500,
   },
   title: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.sm,
   },
   message: {
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   actions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: Spacing.sm,
     marginTop: Spacing.md,
   },
@@ -150,15 +150,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.sm,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   buttonTextPrimary: {
     fontSize: 14,
-    fontWeight: '500',
-    color: '#FFFFFF',
+    fontWeight: "500",
+    color: "#FFFFFF",
   },
 });

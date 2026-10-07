@@ -1,0 +1,39 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "username": "Username",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "register": "Register",
+    "biometricLogin": "Biometric Login"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "prescriptions": "Prescriptions",
+    "medicines": "Medicines",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "roles": {
+    "doctor": "Doctor",
+    "patient": "Patient",
+    "pharmacist": "Pharmacist",
+    "lab": "Laboratory",
+    "physiotherapy": "Physiotherapy",
+    "radiologist": "Radiologist"
+  }
+}

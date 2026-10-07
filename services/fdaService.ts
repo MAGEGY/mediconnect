@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getGenericName } from '@/utils/medicineNormalization';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getGenericName } from "@/utils/medicineNormalization";
 
-const FDA_API_BASE = 'https://api.fda.gov/drug';
+const FDA_API_BASE = "https://api.fda.gov/drug";
 const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 const RATE_LIMIT_DELAY = 250;
 
@@ -26,8 +26,8 @@ interface FDAResponse {
 
 export interface DrugInteraction {
   description: string;
-  severity: 'high' | 'moderate' | 'low';
-  source: 'fda' | 'local';
+  severity: "high" | "moderate" | "low";
+  source: "fda" | "local";
 }
 
 export interface DrugInfo {
@@ -41,11 +41,13 @@ export interface DrugInfo {
 async function rateLimitedFetch(url: string): Promise<Response> {
   const now = Date.now();
   const timeSinceLastRequest = now - lastRequestTime;
-  
+
   if (timeSinceLastRequest < RATE_LIMIT_DELAY) {
-    await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY - timeSinceLastRequest));
+    await new Promise((resolve) =>
+      setTimeout(resolve, RATE_LIMIT_DELAY - timeSinceLastRequest),
+    );
   }
-  
+
   lastRequestTime = Date.now();
   return fetch(url);
 }
@@ -54,13 +56,13 @@ async function getCachedData(key: string): Promise<any | null> {
   try {
     const cached = await AsyncStorage.getItem(`fda_cache_${key}`);
     if (!cached) return null;
-    
+
     const { data, timestamp } = JSON.parse(cached);
     if (Date.now() - timestamp > CACHE_DURATION) {
       await AsyncStorage.removeItem(`fda_cache_${key}`);
       return null;
     }
-    
+
     return data;
   } catch {
     return null;
@@ -71,37 +73,39 @@ async function setCachedData(key: string, data: any): Promise<void> {
   try {
     await AsyncStorage.setItem(
       `fda_cache_${key}`,
-      JSON.stringify({ data, timestamp: Date.now() })
+      JSON.stringify({ data, timestamp: Date.now() }),
     );
   } catch (error) {
-    console.warn('Failed to cache FDA data:', error);
+    console.warn("Failed to cache FDA data:", error);
   }
 }
 
-export async function searchDrugByName(medicineName: string): Promise<DrugInfo | null> {
+export async function searchDrugByName(
+  medicineName: string,
+): Promise<DrugInfo | null> {
   const genericName = getGenericName(medicineName);
-  const cacheKey = genericName.toLowerCase().replace(/[^a-z0-9]/g, '');
-  
+  const cacheKey = genericName.toLowerCase().replace(/[^a-z0-9]/g, "");
+
   const cached = await getCachedData(cacheKey);
   if (cached) return cached;
-  
+
   try {
     const searchTerm = encodeURIComponent(genericName);
     const url = `${FDA_API_BASE}/label.json?search=openfda.generic_name:"${searchTerm}"+OR+openfda.brand_name:"${searchTerm}"&limit=1`;
-    
+
     const response = await rateLimitedFetch(url);
-    
+
     if (!response.ok) {
       if (response.status === 404) return null;
       throw new Error(`FDA API error: ${response.status}`);
     }
-    
+
     const data: FDAResponse = await response.json();
-    
+
     if (!data.results || data.results.length === 0) {
       return null;
     }
-    
+
     const result = data.results[0];
     const drugInfo: DrugInfo = {
       genericName: result.openfda?.generic_name?.[0] || genericName,
@@ -109,89 +113,90 @@ export async function searchDrugByName(medicineName: string): Promise<DrugInfo |
       dosageInfo: result.dosage_and_administration || [],
       warnings: [
         ...(result.warnings || []),
-        ...(result.adverse_reactions || [])
+        ...(result.adverse_reactions || []),
       ],
-      interactions: (result.drug_interactions || []).map(desc => ({
+      interactions: (result.drug_interactions || []).map((desc) => ({
         description: desc,
         severity: determineSeverity(desc),
-        source: 'fda' as const
-      }))
+        source: "fda" as const,
+      })),
     };
-    
+
     await setCachedData(cacheKey, drugInfo);
     return drugInfo;
-    
   } catch (error) {
-    console.error('FDA API error:', error);
+    console.error("FDA API error:", error);
     return null;
   }
 }
 
-function determineSeverity(description: string): 'high' | 'moderate' | 'low' {
+function determineSeverity(description: string): "high" | "moderate" | "low" {
   const lowerDesc = description.toLowerCase();
-  
+
   if (
-    lowerDesc.includes('contraindicated') ||
-    lowerDesc.includes('serious') ||
-    lowerDesc.includes('severe') ||
-    lowerDesc.includes('fatal') ||
-    lowerDesc.includes('death')
+    lowerDesc.includes("contraindicated") ||
+    lowerDesc.includes("serious") ||
+    lowerDesc.includes("severe") ||
+    lowerDesc.includes("fatal") ||
+    lowerDesc.includes("death")
   ) {
-    return 'high';
+    return "high";
   }
-  
+
   if (
-    lowerDesc.includes('caution') ||
-    lowerDesc.includes('monitor') ||
-    lowerDesc.includes('adjust')
+    lowerDesc.includes("caution") ||
+    lowerDesc.includes("monitor") ||
+    lowerDesc.includes("adjust")
   ) {
-    return 'moderate';
+    return "moderate";
   }
-  
-  return 'low';
+
+  return "low";
 }
 
 export async function checkDrugInteractions(
   medicine1: string,
-  medicine2: string
+  medicine2: string,
 ): Promise<DrugInteraction[]> {
   const interactions: DrugInteraction[] = [];
-  
+
   const [drug1Info, drug2Info] = await Promise.all([
     searchDrugByName(medicine1),
-    searchDrugByName(medicine2)
+    searchDrugByName(medicine2),
   ]);
-  
+
   const generic1 = getGenericName(medicine1).toLowerCase();
   const generic2 = getGenericName(medicine2).toLowerCase();
-  
+
   if (drug1Info?.interactions) {
-    drug1Info.interactions.forEach(interaction => {
+    drug1Info.interactions.forEach((interaction) => {
       const desc = interaction.description.toLowerCase();
       if (
         desc.includes(generic2) ||
         desc.includes(medicine2.toLowerCase()) ||
-        (drug2Info && drug2Info.brandNames.some(brand => 
-          desc.includes(brand.toLowerCase())
-        ))
+        (drug2Info &&
+          drug2Info.brandNames.some((brand) =>
+            desc.includes(brand.toLowerCase()),
+          ))
       ) {
         interactions.push(interaction);
       }
     });
   }
-  
+
   if (drug2Info?.interactions) {
-    drug2Info.interactions.forEach(interaction => {
+    drug2Info.interactions.forEach((interaction) => {
       const desc = interaction.description.toLowerCase();
       if (
         desc.includes(generic1) ||
         desc.includes(medicine1.toLowerCase()) ||
-        (drug1Info && drug1Info.brandNames.some(brand => 
-          desc.includes(brand.toLowerCase())
-        ))
+        (drug1Info &&
+          drug1Info.brandNames.some((brand) =>
+            desc.includes(brand.toLowerCase()),
+          ))
       ) {
         const isDuplicate = interactions.some(
-          existing => existing.description === interaction.description
+          (existing) => existing.description === interaction.description,
         );
         if (!isDuplicate) {
           interactions.push(interaction);
@@ -199,7 +204,7 @@ export async function checkDrugInteractions(
       }
     });
   }
-  
+
   return interactions;
 }
 

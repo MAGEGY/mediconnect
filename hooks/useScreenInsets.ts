@@ -7,7 +7,7 @@ import { Spacing } from "@/constants/theme";
 export function useScreenInsets() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  
+
   let tabBarHeight = 0;
   try {
     tabBarHeight = useBottomTabBarHeight();

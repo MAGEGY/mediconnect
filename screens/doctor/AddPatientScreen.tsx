@@ -1,85 +1,85 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { ThemedText } from '@/components/ThemedText';
-import { Card } from '@/components/Card';
-import { ScreenKeyboardAwareScrollView } from '@/components/ScreenKeyboardAwareScrollView';
-import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius, IconSize } from '@/constants/theme';
-import { userService } from '@/utils/data';
+import React, { useState } from "react";
+import { View, StyleSheet, TextInput, Pressable, Alert } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { ThemedText } from "@/components/ThemedText";
+import { Card } from "@/components/Card";
+import { ScreenKeyboardAwareScrollView } from "@/components/ScreenKeyboardAwareScrollView";
+import { useTheme } from "@/hooks/useTheme";
+import { Spacing, BorderRadius, IconSize } from "@/constants/theme";
+import { userService } from "@/utils/data";
 
 export default function AddPatientScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
-    displayName: '',
-    phoneNumber: '',
-    nationalId: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
+    displayName: "",
+    phoneNumber: "",
+    nationalId: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const [errors, setErrors] = useState({
-    displayName: '',
-    phoneNumber: '',
-    nationalId: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
+    displayName: "",
+    phoneNumber: "",
+    nationalId: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const validateForm = () => {
     const newErrors = {
-      displayName: '',
-      phoneNumber: '',
-      nationalId: '',
-      username: '',
-      password: '',
-      confirmPassword: '',
+      displayName: "",
+      phoneNumber: "",
+      nationalId: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
     };
-    
+
     let isValid = true;
 
     if (!formData.displayName.trim()) {
-      newErrors.displayName = 'Full name is required';
+      newErrors.displayName = "Full name is required";
       isValid = false;
     }
 
     if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
+      newErrors.phoneNumber = "Phone number is required";
       isValid = false;
     } else if (!/^\+?[\d\s-]+$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Invalid phone number format';
+      newErrors.phoneNumber = "Invalid phone number format";
       isValid = false;
     }
 
     if (!formData.nationalId.trim()) {
-      newErrors.nationalId = 'National ID is required';
+      newErrors.nationalId = "National ID is required";
       isValid = false;
     }
 
     if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+      newErrors.username = "Username is required";
       isValid = false;
     } else if (formData.username.length < 4) {
-      newErrors.username = 'Username must be at least 4 characters';
+      newErrors.username = "Username must be at least 4 characters";
       isValid = false;
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
       isValid = false;
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+      newErrors.password = "Password must be at least 8 characters";
       isValid = false;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = "Passwords do not match";
       isValid = false;
     }
 
@@ -94,23 +94,26 @@ export default function AddPatientScreen() {
 
     setLoading(true);
     try {
-      const newPatient = await userService.create({
-        username: formData.username,
-        phoneNumber: formData.phoneNumber,
-        nationalId: formData.nationalId,
-        displayName: formData.displayName,
-        role: 'patient',
-        avatarIndex: Math.floor(Math.random() * 3),
-        biometricEnabled: false,
-      }, formData.password);
+      const newPatient = await userService.create(
+        {
+          username: formData.username,
+          phoneNumber: formData.phoneNumber,
+          nationalId: formData.nationalId,
+          displayName: formData.displayName,
+          role: "patient",
+          avatarIndex: Math.floor(Math.random() * 3),
+          biometricEnabled: false,
+        },
+        formData.password,
+      );
 
       Alert.alert(
-        'Success',
+        "Success",
         `Patient ${formData.displayName} has been registered successfully.`,
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: "OK", onPress: () => navigation.goBack() }],
       );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to register patient');
+      Alert.alert("Error", error.message || "Failed to register patient");
     } finally {
       setLoading(false);
     }
@@ -120,8 +123,10 @@ export default function AddPatientScreen() {
     <ScreenKeyboardAwareScrollView>
       <View style={styles.container}>
         <Card>
-          <ThemedText style={styles.sectionTitle}>Patient Information</ThemedText>
-          
+          <ThemedText style={styles.sectionTitle}>
+            Patient Information
+          </ThemedText>
+
           <View style={styles.inputGroup}>
             <ThemedText style={[styles.label, { color: theme.textSecondary }]}>
               Full Name *
@@ -129,11 +134,11 @@ export default function AddPatientScreen() {
             <TextInput
               style={[
                 styles.input,
-                { 
-                  backgroundColor: theme.backgroundDefault, 
+                {
+                  backgroundColor: theme.backgroundDefault,
                   color: theme.text,
-                  borderColor: errors.displayName ? theme.error : 'transparent'
-                }
+                  borderColor: errors.displayName ? theme.error : "transparent",
+                },
               ]}
               placeholder="Enter patient's full name"
               placeholderTextColor={theme.textSecondary}
@@ -141,7 +146,7 @@ export default function AddPatientScreen() {
               onChangeText={(text) => {
                 setFormData({ ...formData, displayName: text });
                 if (errors.displayName) {
-                  setErrors({ ...errors, displayName: '' });
+                  setErrors({ ...errors, displayName: "" });
                 }
               }}
               editable={!loading}
@@ -161,11 +166,11 @@ export default function AddPatientScreen() {
             <TextInput
               style={[
                 styles.input,
-                { 
-                  backgroundColor: theme.backgroundDefault, 
+                {
+                  backgroundColor: theme.backgroundDefault,
                   color: theme.text,
-                  borderColor: errors.phoneNumber ? theme.error : 'transparent' 
-                }
+                  borderColor: errors.phoneNumber ? theme.error : "transparent",
+                },
               ]}
               placeholder="+20 123 456 7890"
               placeholderTextColor={theme.textSecondary}
@@ -173,7 +178,7 @@ export default function AddPatientScreen() {
               onChangeText={(text) => {
                 setFormData({ ...formData, phoneNumber: text });
                 if (errors.phoneNumber) {
-                  setErrors({ ...errors, phoneNumber: '' });
+                  setErrors({ ...errors, phoneNumber: "" });
                 }
               }}
               keyboardType="phone-pad"
@@ -194,11 +199,11 @@ export default function AddPatientScreen() {
             <TextInput
               style={[
                 styles.input,
-                { 
-                  backgroundColor: theme.backgroundDefault, 
+                {
+                  backgroundColor: theme.backgroundDefault,
                   color: theme.text,
-                  borderColor: errors.nationalId ? theme.error : 'transparent' 
-                }
+                  borderColor: errors.nationalId ? theme.error : "transparent",
+                },
               ]}
               placeholder="Enter national ID number"
               placeholderTextColor={theme.textSecondary}
@@ -206,7 +211,7 @@ export default function AddPatientScreen() {
               onChangeText={(text) => {
                 setFormData({ ...formData, nationalId: text });
                 if (errors.nationalId) {
-                  setErrors({ ...errors, nationalId: '' });
+                  setErrors({ ...errors, nationalId: "" });
                 }
               }}
               editable={!loading}
@@ -220,8 +225,10 @@ export default function AddPatientScreen() {
         </Card>
 
         <Card style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>Account Credentials</ThemedText>
-          
+          <ThemedText style={styles.sectionTitle}>
+            Account Credentials
+          </ThemedText>
+
           <View style={styles.inputGroup}>
             <ThemedText style={[styles.label, { color: theme.textSecondary }]}>
               Username *
@@ -229,11 +236,11 @@ export default function AddPatientScreen() {
             <TextInput
               style={[
                 styles.input,
-                { 
-                  backgroundColor: theme.backgroundDefault, 
+                {
+                  backgroundColor: theme.backgroundDefault,
                   color: theme.text,
-                  borderColor: errors.username ? theme.error : 'transparent' 
-                }
+                  borderColor: errors.username ? theme.error : "transparent",
+                },
               ]}
               placeholder="Choose a unique username"
               placeholderTextColor={theme.textSecondary}
@@ -241,7 +248,7 @@ export default function AddPatientScreen() {
               onChangeText={(text) => {
                 setFormData({ ...formData, username: text.toLowerCase() });
                 if (errors.username) {
-                  setErrors({ ...errors, username: '' });
+                  setErrors({ ...errors, username: "" });
                 }
               }}
               autoCapitalize="none"
@@ -262,11 +269,11 @@ export default function AddPatientScreen() {
             <TextInput
               style={[
                 styles.input,
-                { 
-                  backgroundColor: theme.backgroundDefault, 
+                {
+                  backgroundColor: theme.backgroundDefault,
                   color: theme.text,
-                  borderColor: errors.password ? theme.error : 'transparent' 
-                }
+                  borderColor: errors.password ? theme.error : "transparent",
+                },
               ]}
               placeholder="Minimum 8 characters"
               placeholderTextColor={theme.textSecondary}
@@ -274,7 +281,7 @@ export default function AddPatientScreen() {
               onChangeText={(text) => {
                 setFormData({ ...formData, password: text });
                 if (errors.password) {
-                  setErrors({ ...errors, password: '' });
+                  setErrors({ ...errors, password: "" });
                 }
               }}
               secureTextEntry
@@ -295,11 +302,13 @@ export default function AddPatientScreen() {
             <TextInput
               style={[
                 styles.input,
-                { 
-                  backgroundColor: theme.backgroundDefault, 
+                {
+                  backgroundColor: theme.backgroundDefault,
                   color: theme.text,
-                  borderColor: errors.confirmPassword ? theme.error : 'transparent' 
-                }
+                  borderColor: errors.confirmPassword
+                    ? theme.error
+                    : "transparent",
+                },
               ]}
               placeholder="Re-enter password"
               placeholderTextColor={theme.textSecondary}
@@ -307,7 +316,7 @@ export default function AddPatientScreen() {
               onChangeText={(text) => {
                 setFormData({ ...formData, confirmPassword: text });
                 if (errors.confirmPassword) {
-                  setErrors({ ...errors, confirmPassword: '' });
+                  setErrors({ ...errors, confirmPassword: "" });
                 }
               }}
               secureTextEntry
@@ -325,19 +334,21 @@ export default function AddPatientScreen() {
         <Pressable
           style={[
             styles.submitButton,
-            { backgroundColor: loading ? theme.textSecondary : theme.primary }
+            { backgroundColor: loading ? theme.textSecondary : theme.primary },
           ]}
           onPress={handleSubmit}
           disabled={loading}
-          android_ripple={{ color: theme.buttonText + '40' }}
+          android_ripple={{ color: theme.buttonText + "40" }}
         >
-          <MaterialCommunityIcons 
-            name={loading ? "loading" : "account-plus"} 
-            size={IconSize.sm} 
-            color={theme.buttonText} 
+          <MaterialCommunityIcons
+            name={loading ? "loading" : "account-plus"}
+            size={IconSize.sm}
+            color={theme.buttonText}
           />
-          <ThemedText style={[styles.submitButtonText, { color: theme.buttonText }]}>
-            {loading ? 'Registering...' : 'Register Patient'}
+          <ThemedText
+            style={[styles.submitButtonText, { color: theme.buttonText }]}
+          >
+            {loading ? "Registering..." : "Register Patient"}
           </ThemedText>
         </Pressable>
       </View>
@@ -354,7 +365,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.lg,
   },
   inputGroup: {
@@ -362,7 +373,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: Spacing.sm,
   },
   input: {
@@ -377,9 +388,9 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
   },
   submitButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     height: Spacing.buttonHeight,
     borderRadius: BorderRadius.sm,
     marginTop: Spacing.xl,
@@ -387,6 +398,6 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

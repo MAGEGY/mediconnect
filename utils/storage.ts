@@ -1,15 +1,15 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const KEYS = {
-  CURRENT_USER: '@medrecord_current_user',
-  USERS: '@medrecord_users',
-  PATIENTS: '@medrecord_patients',
-  MEDICINES: '@medrecord_medicines',
-  PRESCRIPTIONS: '@medrecord_prescriptions',
-  VITAL_SIGNS: '@medrecord_vital_signs',
-  LIFESTYLE_DATA: '@medrecord_lifestyle',
-  DISPENSING_HISTORY: '@medrecord_dispensing',
-  ALLERGIES: '@medrecord_allergies',
+  CURRENT_USER: "@medrecord_current_user",
+  USERS: "@medrecord_users",
+  PATIENTS: "@medrecord_patients",
+  MEDICINES: "@medrecord_medicines",
+  PRESCRIPTIONS: "@medrecord_prescriptions",
+  VITAL_SIGNS: "@medrecord_vital_signs",
+  LIFESTYLE_DATA: "@medrecord_lifestyle",
+  DISPENSING_HISTORY: "@medrecord_dispensing",
+  ALLERGIES: "@medrecord_allergies",
 };
 
 export const storage = {
@@ -18,7 +18,7 @@ export const storage = {
       const value = await AsyncStorage.getItem(KEYS.CURRENT_USER);
       return value ? JSON.parse(value) : null;
     } catch (error) {
-      console.error('Error getting user:', error);
+      console.error("Error getting user:", error);
       return null;
     }
   },
@@ -27,7 +27,7 @@ export const storage = {
     try {
       await AsyncStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(user));
     } catch (error) {
-      console.error('Error setting user:', error);
+      console.error("Error setting user:", error);
     }
   },
 
@@ -35,7 +35,7 @@ export const storage = {
     try {
       await AsyncStorage.removeItem(KEYS.CURRENT_USER);
     } catch (error) {
-      console.error('Error removing user:', error);
+      console.error("Error removing user:", error);
     }
   },
 
@@ -43,7 +43,7 @@ export const storage = {
     try {
       await AsyncStorage.clear();
     } catch (error) {
-      console.error('Error clearing storage:', error);
+      console.error("Error clearing storage:", error);
     }
   },
 

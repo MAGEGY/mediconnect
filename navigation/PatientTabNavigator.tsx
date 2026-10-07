@@ -1,13 +1,15 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { Platform, StyleSheet } from 'react-native';
-import { useTheme } from '@/hooks/useTheme';
-import PatientHomeScreen from '@/screens/patient/PatientHomeScreen';
-import MedicationsScreen from '@/screens/patient/MedicationsScreen';
-import LifestyleScreen from '@/screens/patient/LifestyleScreen';
-import ProfileScreen from '@/screens/shared/ProfileScreen';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { Platform, StyleSheet } from "react-native";
+import { useTheme } from "@/hooks/useTheme";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import PatientHomeScreen from "@/screens/patient/PatientHomeScreen";
+import MedicationsScreen from "@/screens/patient/MedicationsScreen";
+import LifestyleScreen from "@/screens/patient/LifestyleScreen";
+import ProfileScreen from "@/screens/shared/ProfileScreen";
 
 export type PatientTabParamList = {
   Home: undefined;
@@ -20,6 +22,7 @@ const Tab = createBottomTabNavigator<PatientTabParamList>();
 
 export default function PatientTabNavigator() {
   const { theme, isDark } = useTheme();
+  const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   return (
     <Tab.Navigator
@@ -28,19 +31,19 @@ export default function PatientTabNavigator() {
         tabBarActiveTintColor: theme.tabIconSelected,
         tabBarInactiveTintColor: theme.tabIconDefault,
         tabBarStyle: {
-          position: 'absolute',
+          position: "absolute",
           backgroundColor: Platform.select({
-            ios: 'transparent',
+            ios: "transparent",
             android: theme.backgroundRoot,
           }),
           borderTopWidth: 0,
           elevation: 0,
         },
         tabBarBackground: () =>
-          Platform.OS === 'ios' ? (
+          Platform.OS === "ios" ? (
             <BlurView
               intensity={100}
-              tint={isDark ? 'dark' : 'light'}
+              tint={isDark ? "dark" : "light"}
               style={StyleSheet.absoluteFill}
             />
           ) : null,
@@ -55,7 +58,7 @@ export default function PatientTabNavigator() {
         name="Home"
         component={PatientHomeScreen}
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ color, size }) => (
             <Feather name="home" size={size} color={color} />
           ),
@@ -65,7 +68,7 @@ export default function PatientTabNavigator() {
         name="Medications"
         component={MedicationsScreen}
         options={{
-          title: 'Medications',
+          title: "Medications",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="pill" size={size} color={color} />
           ),
@@ -75,19 +78,29 @@ export default function PatientTabNavigator() {
         name="Lifestyle"
         component={LifestyleScreen}
         options={{
-          title: 'Lifestyle',
+          title: "Lifestyle",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="heart-pulse" size={size} color={color} />
+            <MaterialCommunityIcons
+              name="heart-pulse"
+              size={size}
+              color={color}
+            />
           ),
         }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate("Settings");
+          },
+        }}
         options={{
-          title: 'Profile',
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="user" size={size} color={color} />
+            <MaterialCommunityIcons name="cog" size={size} color={color} />
           ),
         }}
       />

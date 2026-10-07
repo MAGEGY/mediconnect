@@ -1,26 +1,26 @@
-import React from 'react';
-import { View, StyleSheet, Pressable, Image, Alert } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useAuth } from '@/contexts/AuthContext';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { ScreenScrollView } from '@/components/ScreenScrollView';
-import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius, Shadows, IconSize } from '@/constants/theme';
+import React from "react";
+import { View, StyleSheet, Pressable, Image, Alert } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuth } from "@/contexts/AuthContext";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { ScreenScrollView } from "@/components/ScreenScrollView";
+import { useTheme } from "@/hooks/useTheme";
+import { Spacing, BorderRadius, Shadows, IconSize } from "@/constants/theme";
 
 const AVATARS = [
-  require('@/assets/avatars/stethoscope.png'),
-  require('@/assets/avatars/medical-cross.png'),
-  require('@/assets/avatars/heartbeat.png'),
+  require("@/assets/avatars/stethoscope.png"),
+  require("@/assets/avatars/medical-cross.png"),
+  require("@/assets/avatars/heartbeat.png"),
 ];
 
 const ROLE_LABELS: Record<string, string> = {
-  patient: 'Patient',
-  doctor: 'Doctor',
-  pharmacist: 'Pharmacist',
-  lab: 'Lab Technician',
-  physiotherapy: 'Physiotherapist',
-  radiologist: 'Radiologist',
+  patient: "Patient",
+  doctor: "Doctor",
+  pharmacist: "Pharmacist",
+  lab: "Lab Technician",
+  physiotherapy: "Physiotherapist",
+  radiologist: "Radiologist",
 };
 
 export default function ProfileScreen() {
@@ -30,25 +30,21 @@ export default function ProfileScreen() {
   if (!user) return null;
 
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: logout,
-        },
-      ]
-    );
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: logout,
+      },
+    ]);
   };
 
   const MenuItem = ({ icon, title, onPress, danger }: any) => (
     <Pressable
       style={[styles.menuItem, { backgroundColor: theme.surface }]}
       onPress={onPress}
-      android_ripple={{ color: theme.primary + '20' }}
+      android_ripple={{ color: theme.primary + "20" }}
     >
       <MaterialCommunityIcons
         name={icon}
@@ -58,7 +54,11 @@ export default function ProfileScreen() {
       <ThemedText style={[styles.menuText, danger && { color: theme.error }]}>
         {title}
       </ThemedText>
-      <MaterialCommunityIcons name="chevron-right" size={IconSize.md} color={theme.textSecondary} />
+      <MaterialCommunityIcons
+        name="chevron-right"
+        size={IconSize.md}
+        color={theme.textSecondary}
+      />
     </Pressable>
   );
 
@@ -73,7 +73,12 @@ export default function ProfileScreen() {
           <ThemedText style={[styles.name, { color: theme.buttonText }]}>
             {user.displayName}
           </ThemedText>
-          <View style={[styles.roleBadge, { backgroundColor: theme.buttonText + '20' }]}>
+          <View
+            style={[
+              styles.roleBadge,
+              { backgroundColor: theme.buttonText + "20" },
+            ]}
+          >
             <ThemedText style={[styles.roleText, { color: theme.buttonText }]}>
               {ROLE_LABELS[user.role]}
             </ThemedText>
@@ -84,43 +89,59 @@ export default function ProfileScreen() {
           <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>
             Account Information
           </ThemedText>
-          
+
           <View style={[styles.infoCard, { backgroundColor: theme.surface }]}>
             <View style={styles.infoRow}>
-              <ThemedText style={[styles.infoLabel, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.infoLabel, { color: theme.textSecondary }]}
+              >
                 Username
               </ThemedText>
               <ThemedText style={[styles.infoValue, { color: theme.text }]}>
                 {user.username}
               </ThemedText>
             </View>
-            
-            <View style={[styles.divider, { backgroundColor: theme.divider }]} />
-            
+
+            <View
+              style={[styles.divider, { backgroundColor: theme.divider }]}
+            />
+
             <View style={styles.infoRow}>
-              <ThemedText style={[styles.infoLabel, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.infoLabel, { color: theme.textSecondary }]}
+              >
                 Phone Number
               </ThemedText>
               <ThemedText style={[styles.infoValue, { color: theme.text }]}>
                 {user.phoneNumber}
               </ThemedText>
             </View>
-            
-            <View style={[styles.divider, { backgroundColor: theme.divider }]} />
-            
+
+            <View
+              style={[styles.divider, { backgroundColor: theme.divider }]}
+            />
+
             <View style={styles.infoRow}>
-              <ThemedText style={[styles.infoLabel, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.infoLabel, { color: theme.textSecondary }]}
+              >
                 National ID
               </ThemedText>
               <ThemedText style={[styles.infoValue, { color: theme.text }]}>
-                {user.nationalId.replace(/./g, (c, i) => i < user.nationalId.length - 4 ? '•' : c)}
+                {user.nationalId.replace(/./g, (c, i) =>
+                  i < user.nationalId.length - 4 ? "•" : c,
+                )}
               </ThemedText>
             </View>
-            
-            <View style={[styles.divider, { backgroundColor: theme.divider }]} />
-            
+
+            <View
+              style={[styles.divider, { backgroundColor: theme.divider }]}
+            />
+
             <View style={styles.infoRow}>
-              <ThemedText style={[styles.infoLabel, { color: theme.textSecondary }]}>
+              <ThemedText
+                style={[styles.infoLabel, { color: theme.textSecondary }]}
+              >
                 Patient ID
               </ThemedText>
               <ThemedText style={[styles.infoValue, { color: theme.text }]}>
@@ -134,26 +155,37 @@ export default function ProfileScreen() {
           <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>
             Settings
           </ThemedText>
-          
+
           <MenuItem
             icon="bell-outline"
             title="Notifications"
-            onPress={() => Alert.alert('Notifications', 'Notification settings coming soon')}
+            onPress={() =>
+              Alert.alert("Notifications", "Notification settings coming soon")
+            }
           />
           <MenuItem
             icon="lock-outline"
             title="Privacy & Security"
-            onPress={() => Alert.alert('Privacy', 'Privacy settings coming soon')}
+            onPress={() =>
+              Alert.alert("Privacy", "Privacy settings coming soon")
+            }
           />
           <MenuItem
             icon="help-circle-outline"
             title="Help & Support"
-            onPress={() => Alert.alert('Support', 'Contact support at support@medrecord.com')}
+            onPress={() =>
+              Alert.alert("Support", "Contact support at support@medrecord.com")
+            }
           />
           <MenuItem
             icon="information-outline"
             title="About"
-            onPress={() => Alert.alert('About', 'MedRecord v1.0.0\nMedical Records & Prescription Management')}
+            onPress={() =>
+              Alert.alert(
+                "About",
+                "MedRecord v1.0.0\nMedical Records & Prescription Management",
+              )
+            }
           />
           <MenuItem
             icon="logout"
@@ -172,8 +204,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    alignItems: 'center',
-    paddingVertical: Spacing['4xl'],
+    alignItems: "center",
+    paddingVertical: Spacing["4xl"],
     paddingHorizontal: Spacing.xl,
   },
   avatar: {
@@ -184,7 +216,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.sm,
   },
   roleBadge: {
@@ -194,14 +226,14 @@ const styles = StyleSheet.create({
   },
   roleText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   infoSection: {
     padding: Spacing.xl,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.lg,
   },
   infoCard: {
@@ -210,9 +242,9 @@ const styles = StyleSheet.create({
     ...Shadows.card,
   },
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: Spacing.md,
   },
   infoLabel: {
@@ -220,7 +252,7 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   divider: {
     height: 1,
@@ -230,8 +262,8 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: Spacing.lg,
     borderRadius: BorderRadius.sm,
     marginBottom: Spacing.sm,

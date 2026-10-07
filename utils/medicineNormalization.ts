@@ -1,25 +1,31 @@
-import { MEDICINE_TRADE_NAMES, MedicineMapping } from '@/constants/medicineDatabase';
+import {
+  MEDICINE_TRADE_NAMES,
+  MedicineMapping,
+} from "@/constants/medicineDatabase";
 
 let medicineMap: Map<string, string> | null = null;
 let reverseMap: Map<string, string[]> | null = null;
 
 function normalizeName(name: string): string {
-  return name.toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]/g, "");
 }
 
 function initializeMaps() {
   if (medicineMap) return;
-  
+
   medicineMap = new Map();
   reverseMap = new Map();
-  
+
   MEDICINE_TRADE_NAMES.forEach(({ tradeName, genericName }) => {
     const normalizedTrade = normalizeName(tradeName);
     const normalizedGeneric = normalizeName(genericName);
-    
+
     medicineMap!.set(normalizedTrade, genericName);
     medicineMap!.set(normalizedGeneric, genericName);
-    
+
     if (!reverseMap!.has(normalizedGeneric)) {
       reverseMap!.set(normalizedGeneric, []);
     }

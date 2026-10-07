@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Pressable, Alert } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useTheme } from '@/hooks/useTheme';
-import { useAuth } from '@/contexts/AuthContext';
-import { Spacing, BorderRadius, Shadows } from '@/constants/theme';
-import { prescriptionService } from '@/utils/data';
-import { Prescription } from '@/types';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import * as Linking from 'expo-linking';
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, FlatList, Pressable, Alert } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/contexts/AuthContext";
+import { Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { prescriptionService } from "@/utils/data";
+import { Prescription } from "@/types";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import * as Linking from "expo-linking";
 
 export default function PrescriptionsScreen() {
   const { theme } = useTheme();
@@ -25,12 +25,15 @@ export default function PrescriptionsScreen() {
   const loadPrescriptions = async () => {
     try {
       const data = await prescriptionService.getAll();
-      const myPrescriptions = data.filter(p => p.doctorId === user?.id);
-      setPrescriptions(myPrescriptions.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      ));
+      const myPrescriptions = data.filter((p) => p.doctorId === user?.id);
+      setPrescriptions(
+        myPrescriptions.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        ),
+      );
     } catch (error) {
-      console.error('Error loading prescriptions:', error);
+      console.error("Error loading prescriptions:", error);
     } finally {
       setLoading(false);
     }
@@ -38,26 +41,26 @@ export default function PrescriptionsScreen() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   const sendViaSMS = (prescription: Prescription) => {
     Alert.alert(
-      'Send Prescription',
+      "Send Prescription",
       `Send prescription link to ${prescription.patientName} via SMS?`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: "Cancel", style: "cancel" },
         {
-          text: 'Send',
+          text: "Send",
           onPress: () => {
-            Alert.alert('Success', 'Prescription link sent via SMS');
+            Alert.alert("Success", "Prescription link sent via SMS");
           },
         },
-      ]
+      ],
     );
   };
 
@@ -67,14 +70,14 @@ export default function PrescriptionsScreen() {
       onPress={() => {
         Alert.alert(
           item.id,
-          `Patient: ${item.patientName}\nMedicines: ${item.medicines.length}\nStatus: ${item.dispensedAt ? 'Dispensed' : 'Pending'}`,
+          `Patient: ${item.patientName}\nMedicines: ${item.medicines.length}\nStatus: ${item.dispensedAt ? "Dispensed" : "Pending"}`,
           [
-            { text: 'OK' },
-            { text: 'Send SMS', onPress: () => sendViaSMS(item) },
-          ]
+            { text: "OK" },
+            { text: "Send SMS", onPress: () => sendViaSMS(item) },
+          ],
         );
       }}
-      android_ripple={{ color: theme.primary + '20' }}
+      android_ripple={{ color: theme.primary + "20" }}
     >
       <View style={styles.prescriptionHeader}>
         <View style={styles.prescriptionInfo}>
@@ -84,21 +87,41 @@ export default function PrescriptionsScreen() {
           <ThemedText style={[styles.patientName, { color: theme.text }]}>
             {item.patientName}
           </ThemedText>
-          <ThemedText style={[styles.prescriptionDate, { color: theme.textSecondary }]}>
+          <ThemedText
+            style={[styles.prescriptionDate, { color: theme.textSecondary }]}
+          >
             {formatDate(item.createdAt)}
           </ThemedText>
         </View>
-        
+
         {item.dispensedAt ? (
-          <View style={[styles.statusBadge, { backgroundColor: theme.success + '20' }]}>
-            <MaterialCommunityIcons name="check-circle" size={16} color={theme.success} />
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: theme.success + "20" },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="check-circle"
+              size={16}
+              color={theme.success}
+            />
             <ThemedText style={[styles.statusText, { color: theme.success }]}>
               Dispensed
             </ThemedText>
           </View>
         ) : (
-          <View style={[styles.statusBadge, { backgroundColor: theme.warning + '20' }]}>
-            <MaterialCommunityIcons name="clock-outline" size={16} color={theme.warning} />
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: theme.warning + "20" },
+            ]}
+          >
+            <MaterialCommunityIcons
+              name="clock-outline"
+              size={16}
+              color={theme.warning}
+            />
             <ThemedText style={[styles.statusText, { color: theme.warning }]}>
               Pending
             </ThemedText>
@@ -109,7 +132,11 @@ export default function PrescriptionsScreen() {
       <View style={styles.medicinesList}>
         {item.medicines.slice(0, 2).map((med, index) => (
           <View key={index} style={styles.medicineItem}>
-            <MaterialCommunityIcons name="pill" size={16} color={theme.textSecondary} />
+            <MaterialCommunityIcons
+              name="pill"
+              size={16}
+              color={theme.textSecondary}
+            />
             <ThemedText style={[styles.medicineName, { color: theme.text }]}>
               {med.medicineName}
             </ThemedText>
@@ -126,7 +153,11 @@ export default function PrescriptionsScreen() {
         style={[styles.smsButton, { backgroundColor: theme.primary }]}
         onPress={() => sendViaSMS(item)}
       >
-        <MaterialCommunityIcons name="message-text" size={18} color={theme.buttonText} />
+        <MaterialCommunityIcons
+          name="message-text"
+          size={18}
+          color={theme.buttonText}
+        />
         <ThemedText style={[styles.smsButtonText, { color: theme.buttonText }]}>
           Send SMS
         </ThemedText>
@@ -148,8 +179,14 @@ export default function PrescriptionsScreen() {
         onRefresh={loadPrescriptions}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="file-document-outline" size={64} color={theme.textSecondary} />
-            <ThemedText style={[styles.emptyText, { color: theme.textSecondary }]}>
+            <MaterialCommunityIcons
+              name="file-document-outline"
+              size={64}
+              color={theme.textSecondary}
+            />
+            <ThemedText
+              style={[styles.emptyText, { color: theme.textSecondary }]}
+            >
               No prescriptions yet
             </ThemedText>
           </View>
@@ -173,8 +210,8 @@ const styles = StyleSheet.create({
     ...Shadows.card,
   },
   prescriptionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: Spacing.md,
   },
   prescriptionInfo: {
@@ -182,20 +219,20 @@ const styles = StyleSheet.create({
   },
   prescriptionId: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.xs,
   },
   patientName: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: Spacing.xs,
   },
   prescriptionDate: {
     fontSize: 12,
   },
   statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.xs,
@@ -203,14 +240,14 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   medicinesList: {
     marginBottom: Spacing.md,
   },
   medicineItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: Spacing.xs,
     gap: Spacing.sm,
   },
@@ -220,24 +257,24 @@ const styles = StyleSheet.create({
   moreText: {
     fontSize: 12,
     marginTop: Spacing.xs,
-    marginLeft: Spacing['2xl'],
+    marginLeft: Spacing["2xl"],
   },
   smsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.xs,
     gap: Spacing.sm,
   },
   smsButtonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing['5xl'],
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing["5xl"],
   },
   emptyText: {
     fontSize: 16,

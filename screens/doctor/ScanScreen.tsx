@@ -1,18 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Text, Pressable, Alert, Linking, Modal, TextInput } from 'react-native';
-import { CameraView, Camera } from 'expo-camera';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { Card } from '@/components/Card';
-import { useTheme } from '@/hooks/useTheme';
-import { Spacing, BorderRadius } from '@/constants/theme';
-import { patientService } from '@/utils/data';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { DoctorStackParamList } from '@/navigation/DoctorStackNavigator';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Pressable,
+  Alert,
+  Linking,
+  Modal,
+  TextInput,
+} from "react-native";
+import { CameraView, Camera } from "expo-camera";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { Card } from "@/components/Card";
+import { useTheme } from "@/hooks/useTheme";
+import { Spacing, BorderRadius } from "@/constants/theme";
+import { patientService } from "@/utils/data";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { DoctorStackParamList } from "@/navigation/DoctorStackNavigator";
 
 type NavigationProp = NativeStackNavigationProp<DoctorStackParamList>;
 
@@ -24,7 +33,7 @@ export default function ScanScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
     requestPermission();
@@ -32,59 +41,59 @@ export default function ScanScreen() {
 
   const requestPermission = async () => {
     const { status } = await Camera.requestCameraPermissionsAsync();
-    setHasPermission(status === 'granted');
+    setHasPermission(status === "granted");
   };
 
   const handleBarCodeScanned = async ({ data }: { data: string }) => {
     if (scanned) return;
     setScanned(true);
-    
-    const scannedId = data.startsWith('medrecord://patient/') 
-      ? data.replace('medrecord://patient/', '') 
+
+    const scannedId = data.startsWith("medrecord://patient/")
+      ? data.replace("medrecord://patient/", "")
       : data;
     const patient = await patientService.getById(scannedId);
-    
+
     if (patient) {
       Alert.alert(
-        'Patient Found',
+        "Patient Found",
         `${patient.displayName}\nID: ${patient.id}`,
         [
-          { 
-            text: 'View Records', 
+          {
+            text: "View Records",
             onPress: () => {
-              navigation.navigate('PatientDetail', { patientId: patient.id });
+              navigation.navigate("PatientDetail", { patientId: patient.id });
               setScanned(false);
-            } 
+            },
           },
-          { text: 'Scan Again', onPress: () => setScanned(false) },
-        ]
+          { text: "Scan Again", onPress: () => setScanned(false) },
+        ],
       );
     } else {
-      Alert.alert('Error', 'Patient not found', [
-        { text: 'Try Again', onPress: () => setScanned(false) },
+      Alert.alert("Error", "Patient not found", [
+        { text: "Try Again", onPress: () => setScanned(false) },
       ]);
     }
   };
 
   const handleManualEntry = async (inputId: string) => {
     if (!inputId || !inputId.trim()) {
-      Alert.alert('Error', 'Please enter a patient ID');
+      Alert.alert("Error", "Please enter a patient ID");
       setShowManualEntry(false);
-      setInputValue('');
+      setInputValue("");
       setScanned(false);
       return;
     }
 
     const patient = await patientService.getById(inputId.trim());
-    
+
     setShowManualEntry(false);
-    setInputValue('');
+    setInputValue("");
     setScanned(false);
-    
+
     if (patient) {
-      navigation.navigate('PatientDetail', { patientId: patient.id });
+      navigation.navigate("PatientDetail", { patientId: patient.id });
     } else {
-      Alert.alert('Error', 'Patient not found');
+      Alert.alert("Error", "Patient not found");
     }
   };
 
@@ -100,7 +109,11 @@ export default function ScanScreen() {
     return (
       <ThemedView style={styles.container}>
         <View style={styles.centerContent}>
-          <MaterialCommunityIcons name="camera-off" size={64} color={theme.textSecondary} />
+          <MaterialCommunityIcons
+            name="camera-off"
+            size={64}
+            color={theme.textSecondary}
+          />
           <ThemedText style={[styles.permissionText, { color: theme.text }]}>
             Camera permission denied
           </ThemedText>
@@ -108,7 +121,9 @@ export default function ScanScreen() {
             style={[styles.button, { backgroundColor: theme.primary }]}
             onPress={requestPermission}
           >
-            <ThemedText style={[styles.buttonText, { color: theme.buttonText }]}>
+            <ThemedText
+              style={[styles.buttonText, { color: theme.buttonText }]}
+            >
               Grant Permission
             </ThemedText>
           </Pressable>
@@ -125,27 +140,39 @@ export default function ScanScreen() {
           facing="back"
           onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
           barcodeScannerSettings={{
-            barcodeTypes: ['qr'],
+            barcodeTypes: ["qr"],
           }}
         />
-        
+
         <View style={styles.overlay}>
           <View style={[styles.scanArea, { borderColor: theme.primary }]} />
-          
-          <View style={[styles.instructionBox, { backgroundColor: theme.surface }]}>
-            <MaterialCommunityIcons name="qrcode-scan" size={24} color={theme.primary} />
+
+          <View
+            style={[styles.instructionBox, { backgroundColor: theme.surface }]}
+          >
+            <MaterialCommunityIcons
+              name="qrcode-scan"
+              size={24}
+              color={theme.primary}
+            />
             <ThemedText style={[styles.instructionText, { color: theme.text }]}>
-              {scanned ? 'Processing...' : 'Align QR code within frame'}
+              {scanned ? "Processing..." : "Align QR code within frame"}
             </ThemedText>
           </View>
         </View>
 
-        <View style={[styles.bottomActions, { bottom: tabBarHeight + Spacing.xl }]}>
+        <View
+          style={[styles.bottomActions, { bottom: tabBarHeight + Spacing.xl }]}
+        >
           <Pressable
             style={[styles.actionButton, { backgroundColor: theme.surface }]}
             onPress={() => setScanned(false)}
           >
-            <MaterialCommunityIcons name="refresh" size={24} color={theme.primary} />
+            <MaterialCommunityIcons
+              name="refresh"
+              size={24}
+              color={theme.primary}
+            />
             <ThemedText style={[styles.actionText, { color: theme.primary }]}>
               Reset
             </ThemedText>
@@ -155,7 +182,11 @@ export default function ScanScreen() {
             style={[styles.actionButton, { backgroundColor: theme.surface }]}
             onPress={() => setShowManualEntry(true)}
           >
-            <MaterialCommunityIcons name="keyboard" size={24} color={theme.primary} />
+            <MaterialCommunityIcons
+              name="keyboard"
+              size={24}
+              color={theme.primary}
+            />
             <ThemedText style={[styles.actionText, { color: theme.primary }]}>
               Manual
             </ThemedText>
@@ -169,23 +200,33 @@ export default function ScanScreen() {
         animationType="fade"
         onRequestClose={() => {
           setShowManualEntry(false);
-          setInputValue('');
+          setInputValue("");
           setScanned(false);
         }}
       >
-        <Pressable 
+        <Pressable
           style={styles.modalOverlay}
           onPress={() => {
             setShowManualEntry(false);
-            setInputValue('');
+            setInputValue("");
             setScanned(false);
           }}
         >
           <Pressable onPress={(e) => e.stopPropagation()}>
-            <Card style={[styles.modalCard, { backgroundColor: theme.surface }]}>
-              <ThemedText style={styles.modalTitle}>Enter Patient ID</ThemedText>
+            <Card
+              style={[styles.modalCard, { backgroundColor: theme.surface }]}
+            >
+              <ThemedText style={styles.modalTitle}>
+                Enter Patient ID
+              </ThemedText>
               <TextInput
-                style={[styles.modalInput, { backgroundColor: theme.backgroundSecondary, color: theme.text }]}
+                style={[
+                  styles.modalInput,
+                  {
+                    backgroundColor: theme.backgroundSecondary,
+                    color: theme.text,
+                  },
+                ]}
                 value={inputValue}
                 onChangeText={setInputValue}
                 placeholder="Patient ID or National ID"
@@ -194,22 +235,35 @@ export default function ScanScreen() {
               />
               <View style={styles.modalButtons}>
                 <Pressable
-                  style={[styles.modalButton, { backgroundColor: theme.backgroundSecondary }]}
+                  style={[
+                    styles.modalButton,
+                    { backgroundColor: theme.backgroundSecondary },
+                  ]}
                   onPress={() => {
                     setShowManualEntry(false);
-                    setInputValue('');
+                    setInputValue("");
                     setScanned(false);
                   }}
                 >
-                  <ThemedText style={[styles.modalButtonText, { color: theme.text }]}>
+                  <ThemedText
+                    style={[styles.modalButtonText, { color: theme.text }]}
+                  >
                     Cancel
                   </ThemedText>
                 </Pressable>
                 <Pressable
-                  style={[styles.modalButton, { backgroundColor: theme.primary }]}
+                  style={[
+                    styles.modalButton,
+                    { backgroundColor: theme.primary },
+                  ]}
                   onPress={() => handleManualEntry(inputValue)}
                 >
-                  <ThemedText style={[styles.modalButtonText, { color: theme.buttonText }]}>
+                  <ThemedText
+                    style={[
+                      styles.modalButtonText,
+                      { color: theme.buttonText },
+                    ]}
+                  >
                     Search
                   </ThemedText>
                 </Pressable>
@@ -228,23 +282,23 @@ const styles = StyleSheet.create({
   },
   centerContent: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: Spacing.xl,
   },
   permissionText: {
     fontSize: 16,
     marginTop: Spacing.xl,
-    marginBottom: Spacing['2xl'],
+    marginBottom: Spacing["2xl"],
   },
   button: {
-    paddingHorizontal: Spacing['2xl'],
+    paddingHorizontal: Spacing["2xl"],
     paddingVertical: Spacing.lg,
     borderRadius: BorderRadius.sm,
   },
   buttonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   cameraContainer: {
     flex: 1,
@@ -254,8 +308,8 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   scanArea: {
     width: 250,
@@ -264,27 +318,27 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
   },
   instructionBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: Spacing.lg,
     borderRadius: BorderRadius.sm,
-    marginTop: Spacing['3xl'],
+    marginTop: Spacing["3xl"],
     gap: Spacing.md,
   },
   instructionText: {
     fontSize: 14,
   },
   bottomActions: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingHorizontal: Spacing.xl,
   },
   actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.lg,
     borderRadius: BorderRadius.sm,
@@ -292,23 +346,23 @@ const styles = StyleSheet.create({
   },
   actionText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
     padding: Spacing.xl,
   },
   modalCard: {
-    width: '100%',
+    width: "100%",
     maxWidth: 400,
     padding: Spacing.xl,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: Spacing.lg,
   },
   modalInput: {
@@ -319,17 +373,17 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   modalButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: Spacing.md,
   },
   modalButton: {
     flex: 1,
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.sm,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalButtonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

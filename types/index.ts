@@ -1,6 +1,12 @@
-export type UserRole = 'patient' | 'doctor' | 'pharmacist' | 'lab' | 'physiotherapy' | 'radiologist';
+export type UserRole =
+  | "patient"
+  | "doctor"
+  | "pharmacist"
+  | "lab"
+  | "physiotherapy"
+  | "radiologist";
 
-export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
+export type ApprovalStatus = "pending" | "approved" | "rejected";
 
 export interface User {
   id: string;
@@ -72,7 +78,7 @@ export interface PatientAllergy {
   patientId: string;
   allergen: string;
   reaction: string;
-  severity: 'mild' | 'moderate' | 'severe';
+  severity: "mild" | "moderate" | "severe";
   recordedAt: string;
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { reloadAppAsync } from "expo";
 import {
   StyleSheet,
@@ -22,6 +22,12 @@ export type ErrorFallbackProps = {
 export function ErrorFallback({ error, resetError }: ErrorFallbackProps) {
   const { theme } = useTheme();
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Log error for debugging
+  useEffect(() => {
+    console.error("App Error:", error.message);
+    console.error("Full Error:", error);
+  }, [error]);
 
   const handleRestart = async () => {
     try {
