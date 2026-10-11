@@ -4,11 +4,12 @@ import FloatingHelp from "@/components/FloatingHelp";
 import type { HelpFunction, HelpHowTo } from "@/components/FloatingHelp";
 
 const BASE_HOWTOS: HelpHowTo[] = [
-  { title: "Create an account", body: "Register with your name, email and role (doctor, patient, pharmacist). New accounts need approval before you can sign in — once approved, log in with your email and password." },
+  { title: "Try the demo accounts", body: "The app seeds three ready-to-use accounts: doctor1 / Doctor123!, patient1 / Patient123!, pharmacist1 / Pharma123!. Log in with any of them to explore each role." },
+  { title: "About registering", body: "Registration creates a pending account that needs an admin approval — in this demo version only the seeded accounts above can sign in." },
   { title: "Scan a medicine package", body: "Use the Scan screen to photograph a medicine package — the app reads the package text with OCR and identifies the medicine for you." },
   { title: "Prescriptions", body: "Doctors create prescriptions for their patients; patients open and read them; pharmacists dispense against them and track inventory." },
   { title: "Language", body: "The app supports English and Arabic — switch it from the profile/settings screen." },
-  { title: "Where is my data?", body: "The web version stores your session and data in the browser. The Android app stores it on the device and syncs with the backend when configured." },
+  { title: "Where is my data?", body: "Everything is stored locally in your browser (or on the device in the Android app). Nothing is uploaded to a server in this version." },
 ];
 
 export default function AppHelp() {
