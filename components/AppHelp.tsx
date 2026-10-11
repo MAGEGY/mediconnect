@@ -1,4 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { useAppTranslation } from "@/hooks/useTranslation";
 import { navigationRef } from "@/navigation/navigationRef";
 import FloatingHelp from "@/components/FloatingHelp";
 import type { HelpFunction, HelpHowTo } from "@/components/FloatingHelp";
@@ -14,6 +15,7 @@ const BASE_HOWTOS: HelpHowTo[] = [
 
 export default function AppHelp() {
   const { user } = useAuth();
+  const { isRTL } = useAppTranslation();
 
   const functions: HelpFunction[] = [];
 
@@ -56,5 +58,5 @@ export default function AppHelp() {
     }
   }
 
-  return <FloatingHelp color="#0077B6" functions={functions} howtos={BASE_HOWTOS} />;
+  return <FloatingHelp color="#0077B6" rtl={isRTL} functions={functions} howtos={BASE_HOWTOS} />;
 }
