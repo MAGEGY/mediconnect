@@ -75,7 +75,9 @@ export const userService = {
       ...userData,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
-      approvalStatus: "pending",
+      // Local demo mode: no admin approval flow exists, so self-registered
+      // accounts are approved immediately (otherwise they could never sign in).
+      approvalStatus: "approved",
       passwordHash,
       salt,
     };
